@@ -18,7 +18,9 @@
 <meta property="og:title" content="أ. محمد السبكي | مدرس اللغة العربية">
 <meta property="og:description" content="اللغة العربية بمنطق يتفهم مش بيتحفظ. كورسات نحو، بلاغة، أدب وتعبير للإعدادي والثانوي.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="og-image.jpg">
+<meta property="og:url" content="https://mohamed-el-sobky.vercel.app/">
+<meta property="og:image" content="https://mohamed-el-sobky.vercel.app/og-image.jpg">
+<link rel="canonical" href="https://mohamed-el-sobky.vercel.app/">
 <meta property="og:locale" content="ar_EG">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -34,7 +36,7 @@
   "description": "مدرس متخصص في اللغة العربية (نحو، بلاغة، أدب، تعبير وإملاء) للمرحلتين الإعدادية والثانوية.",
   "email": "elsopky44@gmail.com",
   "telephone": "+201007367432",
-  "url": "https://example.com/mohamed-elsabky.html",
+  "url": "https://mohamed-el-sobky.vercel.app/",
   "sameAs": ["https://wa.me/201007367432"],
   "knowsLanguage": "ar"
 }
@@ -271,33 +273,25 @@ html[data-theme="dark"] .theme-toggle-mobile .icon-moon{display:block;}
 .about-photo{
   aspect-ratio:4/5;border-radius:24px;
   background:linear-gradient(160deg,var(--ink-2),var(--ink));
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
   position:relative;overflow:hidden;box-shadow:var(--shadow);
 }
+.about-photo img{
+  width:100%;height:100%;object-fit:cover;object-position:top center;
+  display:block;position:relative;z-index:1;
+}
 .about-photo::before{
-  content:"";position:absolute;inset:0;opacity:.08;pointer-events:none;
+  content:"";position:absolute;inset:0;opacity:.08;pointer-events:none;z-index:2;
   background-image:
     repeating-linear-gradient(45deg,var(--gold) 0,var(--gold) 1px,transparent 1px,transparent 46px),
     repeating-linear-gradient(-45deg,var(--gold) 0,var(--gold) 1px,transparent 1px,transparent 46px);
 }
-.about-badge-ring{
-  position:relative;width:168px;height:168px;border-radius:50%;
-  border:1px dashed rgba(200,155,60,0.4);display:flex;align-items:center;justify-content:center;
-  animation:spin 30s linear infinite;
+.about-photo-scrim{
+  position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:linear-gradient(to top,rgba(17,23,42,0.92) 0%,rgba(17,23,42,0.35) 35%,transparent 58%);
 }
-.about-badge{
-  width:130px;height:130px;border-radius:50%;
-  background:radial-gradient(circle,var(--ink-3),var(--ink-2));
-  border:2px solid var(--gold);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 40px rgba(200,155,60,0.25) inset,0 20px 40px rgba(0,0,0,0.4);
-}
-.about-badge span{
-  font-family:'Amiri',serif;color:var(--gold);font-size:44px;font-weight:700;
-  animation:spin 30s linear infinite reverse;
-}
-.about-name{position:relative;font-family:'Amiri',serif;color:var(--text-light);font-size:21px;letter-spacing:.5px;}
-.about-role{position:relative;color:var(--gold);font-size:13px;letter-spacing:1px;margin-top:-14px;}
+.about-photo-caption{position:absolute;bottom:24px;right:0;left:0;text-align:center;z-index:4;}
+.about-name{font-family:'Amiri',serif;color:var(--text-light);font-size:21px;letter-spacing:.5px;}
+.about-role{color:var(--gold);font-size:13px;letter-spacing:1px;margin-top:4px;}
 .about-list{margin-top:28px;display:grid;gap:18px;}
 .about-item{display:flex;gap:16px;align-items:flex-start;background:var(--card-bg-2);padding:18px 20px;border-radius:16px;transition:transform .25s ease,background .35s ease;}
 .about-item:hover{transform:translateX(-6px);}
@@ -628,9 +622,12 @@ body.sticky-active .back-top{bottom:88px;}
 <section class="about" id="about">
   <div class="container about-grid">
     <div class="reveal about-photo">
-      <div class="about-badge-ring"><div class="about-badge"><span>م.س</span></div></div>
-      <div class="about-name">أ. محمد السبكي</div>
-      <div class="about-role">مدرس اللغة العربية</div>
+      <img src="mohamed-elsabky.jpg" alt="أ. محمد السبكي - مدرس اللغة العربية" loading="lazy" onerror="this.style.display='none'">
+      <div class="about-photo-scrim"></div>
+      <div class="about-photo-caption">
+        <div class="about-name">أ. محمد السبكي</div>
+        <div class="about-role">مدرس اللغة العربية</div>
+      </div>
     </div>
     <div>
       <div class="reveal">
