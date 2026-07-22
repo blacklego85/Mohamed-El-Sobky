@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <script>
 (function(){
   try{
@@ -129,7 +129,7 @@ section{padding:clamp(64px,10vw,110px) 0;position:relative;}
 
 /* back to top */
 .back-top{
-  position:fixed;bottom:26px;right:26px;z-index:900;width:50px;height:50px;border-radius:50%;
+  position:fixed;bottom:calc(26px + env(safe-area-inset-bottom,0px));right:calc(26px + env(safe-area-inset-right,0px));z-index:900;width:50px;height:50px;border-radius:50%;
   background:var(--ink-2);color:var(--gold);display:flex;align-items:center;justify-content:center;
   font-size:18px;border:1px solid rgba(200,155,60,0.3);box-shadow:0 12px 30px rgba(0,0,0,0.25);
   opacity:0;pointer-events:none;transform:translateY(14px);transition:opacity .3s ease,transform .3s ease,background .3s ease;
@@ -161,9 +161,10 @@ section{padding:clamp(64px,10vw,110px) 0;position:relative;}
 /* ===== NAV ===== */
 header{
   position:fixed;top:0;right:0;left:0;z-index:1000;
-  padding:18px 0;transition:background .35s ease,padding .35s ease,box-shadow .35s ease;
+  padding:calc(18px + env(safe-area-inset-top,0px)) max(0px,env(safe-area-inset-right,0px)) 18px max(0px,env(safe-area-inset-left,0px));
+  transition:background .35s ease,padding .35s ease,box-shadow .35s ease;
 }
-header.scrolled{background:rgba(17,23,42,0.92);backdrop-filter:blur(10px);padding:12px 0;box-shadow:0 10px 30px rgba(0,0,0,0.2);}
+header.scrolled{background:rgba(17,23,42,0.92);backdrop-filter:blur(10px);padding-top:calc(12px + env(safe-area-inset-top,0px));padding-bottom:12px;box-shadow:0 10px 30px rgba(0,0,0,0.2);}
 .nav-wrap{display:flex;align-items:center;justify-content:space-between;}
 .logo{display:flex;align-items:center;gap:10px;color:var(--text-light);font-family:'Amiri',serif;font-size:22px;font-weight:700;}
 .logo span{color:var(--gold);}
@@ -459,7 +460,7 @@ footer{background:var(--footer-bg);color:var(--footer-text);padding:50px 0 26px;
 
 /* whatsapp float */
 .wa-float{
-  position:fixed;bottom:26px;left:26px;z-index:900;
+  position:fixed;bottom:calc(26px + env(safe-area-inset-bottom,0px));left:calc(26px + env(safe-area-inset-left,0px));z-index:900;
   width:58px;height:58px;border-radius:50%;background:#25D366;color:#fff;
   display:flex;align-items:center;justify-content:center;font-size:26px;
   box-shadow:0 12px 30px rgba(37,211,102,0.45);animation:pulse 2.4s ease-in-out infinite;
@@ -492,7 +493,7 @@ footer{background:var(--footer-bg);color:var(--footer-text);padding:50px 0 26px;
 .sticky-cta{
   position:fixed;bottom:0;right:0;left:0;z-index:950;
   background:var(--ink-2);border-top:1px solid rgba(200,155,60,0.25);
-  padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:14px 24px calc(14px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;justify-content:space-between;gap:16px;
   transform:translateY(120%);transition:transform .4s ease;box-shadow:0 -12px 30px rgba(0,0,0,0.25);
 }
 .sticky-cta.show{transform:translateY(0);}
@@ -500,8 +501,8 @@ footer{background:var(--footer-bg);color:var(--footer-text);padding:50px 0 26px;
 .sticky-cta-text span{display:block;color:var(--gold);font-family:'Amiri',serif;font-size:17px;}
 .sticky-cta-actions{display:flex;align-items:center;gap:10px;}
 .sticky-cta-close{background:none;color:#B8B097;font-size:20px;line-height:1;padding:4px;}
-body.sticky-active .wa-float{bottom:88px;}
-body.sticky-active .back-top{bottom:88px;}
+body.sticky-active .wa-float{bottom:calc(88px + env(safe-area-inset-bottom,0px));}
+body.sticky-active .back-top{bottom:calc(88px + env(safe-area-inset-bottom,0px));}
 @media(max-width:600px){
   .sticky-cta{padding:12px 16px;}
   .sticky-cta-text{font-size:12px;}
