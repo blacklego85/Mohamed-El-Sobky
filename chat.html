@@ -11,6 +11,17 @@
     if(theme === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); }
   }catch(e){}
 })();
+// robust mobile viewport height (fixes composer bar hidden on some mobile browsers)
+(function(){
+  function setVH(){
+    var h = (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
+    document.documentElement.style.setProperty('--app-vh', h + 'px');
+  }
+  setVH();
+  window.addEventListener('resize', setVH);
+  window.addEventListener('orientationchange', setVH);
+  if(window.visualViewport){ window.visualViewport.addEventListener('resize', setVH); }
+})();
 </script>
 <title>الدردشة | أ. محمد السبكي</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -39,7 +50,7 @@ html[data-theme="dark"]{
 *{margin:0;padding:0;box-sizing:border-box;}
 body{
   font-family:'Cairo',sans-serif;background:var(--page-bg);color:var(--text-primary);
-  height:100vh;height:100dvh;overflow:hidden;transition:background .35s ease,color .35s ease;
+  height:100vh;height:100dvh;height:var(--app-vh,100vh);overflow:hidden;transition:background .35s ease,color .35s ease;
   display:flex;flex-direction:column;
 }
 h1,h2,.display{font-family:'Amiri',serif;}
@@ -111,6 +122,71 @@ button{font-family:'Cairo',sans-serif;cursor:pointer;}
 }
 .composer button:hover{transform:scale(1.06);}
 .composer button:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.attach-btn{background:var(--card-bg-2) !important;color:var(--text-primary) !important;}
+
+/* ambient calm background (works with light + dark) */
+.ambient-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;}
+.ambient-bg span{position:absolute;font-family:'Amiri',serif;color:var(--gold);opacity:.045;will-change:transform;animation:ambientDrift linear infinite;}
+html[data-theme="dark"] .ambient-bg span{opacity:.07;}
+@keyframes ambientDrift{
+  0%{transform:translate(0,0) rotate(0deg);}
+  50%{transform:translate(-22px,-30px) rotate(8deg);}
+  100%{transform:translate(0,0) rotate(0deg);}
+}
+
+/* reply preview bar above composer */
+.reply-preview{
+  display:none;align-items:center;gap:10px;padding:10px 18px;background:var(--card-bg-2);
+  border-top:1px solid var(--border-soft);font-size:13px;
+}
+.reply-preview.show{display:flex;}
+.reply-preview .rp-bar{width:3px;align-self:stretch;background:var(--gold);border-radius:3px;flex:none;}
+.reply-preview .rp-body{flex:1;min-width:0;}
+.reply-preview .rp-name{color:var(--gold);font-weight:700;font-size:12px;}
+.reply-preview .rp-text{color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.reply-preview .rp-close{background:none;border:none;color:var(--text-muted-2);font-size:18px;flex:none;cursor:pointer;}
+
+/* reply quote shown inside a message bubble */
+.msg-quote{
+  background:rgba(0,0,0,0.06);border-right:3px solid var(--gold);border-radius:8px;
+  padding:6px 10px;margin-bottom:6px;font-size:12.5px;cursor:pointer;
+}
+html[data-theme="dark"] .msg-quote{background:rgba(255,255,255,0.06);}
+.msg-quote .qname{color:var(--gold);font-weight:700;display:block;font-size:11.5px;}
+.msg-quote .qtext{color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:220px;}
+
+/* message action popup (reply / edit / delete) */
+.msg-bubble{cursor:pointer;}
+.msg-actions-menu{
+  position:fixed;z-index:800;background:var(--card-bg);border:1px solid var(--border-soft);border-radius:14px;
+  box-shadow:0 16px 40px rgba(0,0,0,0.25);padding:6px;min-width:150px;display:none;flex-direction:column;
+}
+.msg-actions-menu.show{display:flex;}
+.msg-actions-menu button{
+  background:none;border:none;text-align:right;padding:10px 14px;border-radius:9px;font-size:13.5px;
+  color:var(--text-primary);display:flex;align-items:center;gap:8px;
+}
+.msg-actions-menu button:hover{background:var(--card-bg-2);}
+.msg-actions-menu button.danger{color:var(--danger);}
+.msg-actions-overlay{position:fixed;inset:0;z-index:799;display:none;}
+.msg-actions-overlay.show{display:block;}
+
+/* image / file messages */
+.msg-image{max-width:230px;border-radius:14px;display:block;cursor:pointer;margin-bottom:2px;}
+.msg-file-card{
+  display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.05);border-radius:12px;padding:10px 12px;min-width:190px;
+}
+html[data-theme="dark"] .msg-file-card{background:rgba(255,255,255,0.06);}
+.msg-file-card .fic{font-size:22px;flex:none;}
+.msg-file-card .finfo{min-width:0;}
+.msg-file-card .fname{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;}
+.msg-file-card .fsize{font-size:11px;color:var(--text-muted-2);}
+.upload-chip{
+  display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:12.5px;color:var(--text-muted);
+  background:var(--card-bg-2);border-radius:100px;margin:0 18px;
+}
+.upload-chip .spin{width:12px;height:12px;border-radius:50%;border:2px solid var(--gold);border-top-color:transparent;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
 .gate{position:fixed;inset:0;background:var(--page-bg);z-index:500;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;}
 .gate.hide{display:none;}
@@ -137,6 +213,8 @@ button{font-family:'Cairo',sans-serif;cursor:pointer;}
 </head>
 <body>
 
+<div class="ambient-bg" id="ambientBg"></div>
+
 <div class="top-bar">
   <a href="index.html" class="logo">أ<span>.</span> محمد السبكي</a>
   <div class="top-actions">
@@ -153,10 +231,24 @@ button{font-family:'Cairo',sans-serif;cursor:pointer;}
   <div class="chat-area">
     <div class="chat-header"><h2 id="roomTitle">الدردشة العامة</h2></div>
     <div class="messages" id="messages"><div class="empty-state">جاري التحميل...</div></div>
+    <div class="reply-preview" id="replyPreview">
+      <div class="rp-bar"></div>
+      <div class="rp-body">
+        <div class="rp-name" id="rpName"></div>
+        <div class="rp-text" id="rpText"></div>
+      </div>
+      <button type="button" class="rp-close" id="rpClose">×</button>
+    </div>
+    <div class="upload-chip" id="uploadChip" style="display:none;"><span class="spin"></span><span id="uploadChipText">جاري رفع الملف...</span></div>
     <form class="composer" id="composer">
+      <input type="file" id="fileInput" accept="image/*,.pdf,application/pdf" hidden>
+      <button type="button" id="attachBtn" class="attach-btn" title="إرفاق صورة أو PDF">📎</button>
       <input type="text" id="msgInput" placeholder="اكتب رسالتك..." maxlength="900" autocomplete="off">
       <button type="submit" id="sendBtn">➤</button>
     </form>
+
+    <div class="msg-actions-overlay" id="actionsOverlay"></div>
+    <div class="msg-actions-menu" id="actionsMenu"></div>
   </div>
 </div>
 
@@ -176,6 +268,9 @@ import {
   getFirestore, doc, getDoc, collection, addDoc, deleteDoc, updateDoc,
   query, orderBy, limit, onSnapshot, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDxpnYFbxF7Vtx_Y0v5cCbZddsUbs1Q2co",
@@ -189,6 +284,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // theme toggle
 const themeToggle = document.getElementById('themeToggle');
@@ -200,6 +296,23 @@ themeToggle.addEventListener('click', ()=>{
   else{ document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('theme','dark'); }
   applyThemeIcon();
 });
+
+// calm ambient background letters
+(function(){
+  const letters=['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','س','ع','ف','ق','ل','م','ن','ه'];
+  const layer=document.getElementById('ambientBg');
+  const positions=[[8,12],[85,10],[20,55],[70,60],[45,80],[90,85],[5,90],[55,25]];
+  positions.forEach(pos=>{
+    const s=document.createElement('span');
+    s.textContent=letters[Math.floor(Math.random()*letters.length)];
+    s.style.left=pos[0]+'%';
+    s.style.top=pos[1]+'%';
+    s.style.fontSize=(50+Math.random()*70)+'px';
+    s.style.animationDuration=(16+Math.random()*14)+'s';
+    s.style.animationDelay=(Math.random()*8)+'s';
+    layer.appendChild(s);
+  });
+})();
 
 const ROOMS = [
   { id: 'general', name: 'الدردشة العامة' },
@@ -224,12 +337,24 @@ const msgInput = document.getElementById('msgInput');
 const sendBtn = document.getElementById('sendBtn');
 const gateEl = document.getElementById('gate');
 const myAvatarEl = document.getElementById('myAvatar');
+const replyPreviewEl = document.getElementById('replyPreview');
+const rpNameEl = document.getElementById('rpName');
+const rpTextEl = document.getElementById('rpText');
+const rpCloseEl = document.getElementById('rpClose');
+const fileInputEl = document.getElementById('fileInput');
+const attachBtnEl = document.getElementById('attachBtn');
+const uploadChipEl = document.getElementById('uploadChip');
+const uploadChipTextEl = document.getElementById('uploadChipText');
+const actionsMenuEl = document.getElementById('actionsMenu');
+const actionsOverlayEl = document.getElementById('actionsOverlay');
 
 let currentUser = null;
 let currentProfile = null;
 let isAdmin = false;
 let currentRoom = 'general';
 let unsubscribe = null;
+let replyingTo = null;
+const messagesCache = {};
 
 function renderRoomLists(){
   roomsEl.innerHTML = '';
@@ -253,6 +378,8 @@ function switchRoom(roomId){
   currentRoom = roomId;
   const room = ROOMS.find(r=>r.id===roomId);
   roomTitleEl.textContent = room ? room.name : '';
+  clearReply();
+  closeActionsMenu();
   renderRoomLists();
   listenMessages();
 }
@@ -262,6 +389,111 @@ function formatTime(ts){
   const d = ts.toDate();
   return d.toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' });
 }
+
+function formatFileSize(bytes){
+  if(!bytes) return '';
+  if(bytes < 1024*1024) return Math.round(bytes/1024)+' كيلوبايت';
+  return (bytes/(1024*1024)).toFixed(1)+' ميجابايت';
+}
+
+// ---- reply bar ----
+function setReplyTarget(id, name, text){
+  replyingTo = { id, name, text: text || '📎 ملف مرفق' };
+  rpNameEl.textContent = 'الرد على ' + name;
+  rpTextEl.textContent = replyingTo.text;
+  replyPreviewEl.classList.add('show');
+  msgInput.focus();
+}
+function clearReply(){
+  replyingTo = null;
+  replyPreviewEl.classList.remove('show');
+}
+rpCloseEl.addEventListener('click', clearReply);
+
+// ---- action menu (reply / edit / delete) ----
+function closeActionsMenu(){
+  actionsMenuEl.classList.remove('show');
+  actionsOverlayEl.classList.remove('show');
+  actionsMenuEl.innerHTML = '';
+}
+actionsOverlayEl.addEventListener('click', closeActionsMenu);
+
+function openActionsMenu(anchorEl, actions){
+  actionsMenuEl.innerHTML = '';
+  actions.forEach(a=>{
+    const btn = document.createElement('button');
+    btn.className = a.danger ? 'danger' : '';
+    btn.innerHTML = a.icon + ' <span>' + a.label + '</span>';
+    btn.addEventListener('click', ()=>{ closeActionsMenu(); a.onClick(); });
+    actionsMenuEl.appendChild(btn);
+  });
+  const rect = anchorEl.getBoundingClientRect();
+  actionsMenuEl.classList.add('show');
+  actionsOverlayEl.classList.add('show');
+  const menuHeight = actionsMenuEl.offsetHeight;
+  let top = rect.bottom + 6;
+  if(top + menuHeight > window.innerHeight - 20){ top = rect.top - menuHeight - 6; }
+  let left = rect.left;
+  if(left + 160 > window.innerWidth - 10){ left = window.innerWidth - 170; }
+  actionsMenuEl.style.top = Math.max(10,top) + 'px';
+  actionsMenuEl.style.left = Math.max(10,left) + 'px';
+}
+
+// ---- file upload ----
+attachBtnEl.addEventListener('click', ()=> fileInputEl.click());
+fileInputEl.addEventListener('change', async ()=>{
+  const file = fileInputEl.files[0];
+  fileInputEl.value = '';
+  if(!file || !currentUser || !currentProfile) return;
+
+  const isImage = file.type.startsWith('image/');
+  const isPdf = file.type === 'application/pdf';
+  if(!isImage && !isPdf){
+    alert('الملفات المسموحة بس: صور أو PDF.');
+    return;
+  }
+  if(file.size > 10 * 1024 * 1024){
+    alert('حجم الملف كبير أوي، الحد الأقصى 10 ميجابايت.');
+    return;
+  }
+
+  uploadChipEl.style.display = 'flex';
+  uploadChipTextEl.textContent = 'جاري رفع ' + (isImage ? 'الصورة' : 'الملف') + '...';
+
+  try{
+    const path = 'chatUploads/' + currentRoom + '/' + currentUser.uid + '_' + Date.now() + '_' + file.name;
+    const sRef = storageRef(storage, path);
+    const task = uploadBytesResumable(sRef, file);
+
+    task.on('state_changed', (snap)=>{
+      const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+      uploadChipTextEl.textContent = 'جاري الرفع... ' + pct + '%';
+    });
+
+    await task;
+    const url = await getDownloadURL(sRef);
+
+    const payload = {
+      uid: currentUser.uid,
+      name: currentProfile.name,
+      photoURL: currentProfile.photoURL,
+      verified: currentProfile.verified === true,
+      text: '',
+      type: isImage ? 'image' : 'file',
+      fileURL: url,
+      fileName: file.name,
+      fileSize: file.size,
+      createdAt: serverTimestamp()
+    };
+    if(replyingTo){ payload.replyTo = replyingTo; clearReply(); }
+
+    await addDoc(collection(db, 'chatRooms', currentRoom, 'messages'), payload);
+  }catch(err){
+    alert('حصلت مشكلة في رفع الملف، جرب تاني.');
+  }finally{
+    uploadChipEl.style.display = 'none';
+  }
+});
 
 function listenMessages(){
   if(unsubscribe) unsubscribe();
@@ -279,9 +511,11 @@ function listenMessages(){
     messagesEl.innerHTML = '';
     snap.forEach(docSnap=>{
       const m = docSnap.data();
+      messagesCache[docSnap.id] = m;
       const isOwn = currentUser && m.uid === currentUser.uid;
       const row = document.createElement('div');
       row.className = 'msg-row' + (isOwn ? ' own' : '');
+      row.id = 'msg-' + docSnap.id;
 
       const avatar = document.createElement('img');
       avatar.className = 'msg-avatar';
@@ -296,7 +530,47 @@ function listenMessages(){
 
       const bubble = document.createElement('div');
       bubble.className = 'msg-bubble';
-      bubble.textContent = m.text || '';
+
+      if(m.replyTo){
+        const quote = document.createElement('div');
+        quote.className = 'msg-quote';
+        quote.innerHTML = '<span class="qname">' + (m.replyTo.name || '') + '</span><span class="qtext"></span>';
+        quote.querySelector('.qtext').textContent = m.replyTo.text || '';
+        quote.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          const target = document.getElementById('msg-' + m.replyTo.id);
+          if(target){ target.scrollIntoView({behavior:'smooth', block:'center'}); }
+        });
+        bubble.appendChild(quote);
+      }
+
+      if(m.type === 'image' && m.fileURL){
+        const img = document.createElement('img');
+        img.className = 'msg-image';
+        img.src = m.fileURL;
+        img.addEventListener('click', (e)=>{ e.stopPropagation(); window.open(m.fileURL, '_blank'); });
+        bubble.appendChild(img);
+        if(m.text){
+          const cap = document.createElement('div');
+          cap.textContent = m.text;
+          cap.style.marginTop = '4px';
+          bubble.appendChild(cap);
+        }
+      } else if(m.type === 'file' && m.fileURL){
+        const card = document.createElement('a');
+        card.className = 'msg-file-card';
+        card.href = m.fileURL;
+        card.target = '_blank';
+        card.addEventListener('click', (e)=> e.stopPropagation());
+        card.innerHTML = '<span class="fic">📄</span><div class="finfo"><div class="fname"></div><div class="fsize"></div></div>';
+        card.querySelector('.fname').textContent = m.fileName || 'ملف';
+        card.querySelector('.fsize').textContent = formatFileSize(m.fileSize);
+        bubble.appendChild(card);
+      } else {
+        const textSpan = document.createElement('span');
+        textSpan.textContent = m.text || '';
+        bubble.appendChild(textSpan);
+      }
 
       const meta = document.createElement('div');
       meta.className = 'msg-time';
@@ -309,55 +583,58 @@ function listenMessages(){
       row.appendChild(avatar);
       row.appendChild(body);
 
-      if(isOwn){
-        const editBtn = document.createElement('button');
-        editBtn.className = 'msg-edit';
-        editBtn.textContent = '✏️';
-        editBtn.title = 'تعديل الرسالة';
-        editBtn.addEventListener('click', ()=>{
-          const editBox = document.createElement('div');
-          editBox.className = 'edit-box';
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.value = m.text || '';
-          input.maxLength = 900;
-          const saveBtn = document.createElement('button');
-          saveBtn.textContent = 'حفظ';
-          const cancelBtn = document.createElement('button');
-          cancelBtn.className = 'cancel-edit';
-          cancelBtn.textContent = 'إلغاء';
-          editBox.appendChild(input);
-          editBox.appendChild(saveBtn);
-          editBox.appendChild(cancelBtn);
-          body.replaceChild(editBox, bubble);
-          input.focus();
-
-          async function save(){
-            const newText = input.value.trim();
-            if(!newText) return;
-            try{
-              await updateDoc(doc(db,'chatRooms',currentRoom,'messages',docSnap.id), {
-                text: newText, editedAt: serverTimestamp()
-              });
-            }catch(e){}
-          }
-          saveBtn.addEventListener('click', save);
-          input.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); save(); } });
-          cancelBtn.addEventListener('click', ()=>{ body.replaceChild(bubble, editBox); });
+      // click on bubble -> contextual actions menu
+      bubble.addEventListener('click', ()=>{
+        const actions = [];
+        actions.push({
+          icon:'↩️', label:'رد',
+          onClick: ()=> setReplyTarget(docSnap.id, m.name || 'طالب', m.text || (m.type==='image' ? '📷 صورة' : m.type==='file' ? '📎 ' + (m.fileName||'ملف') : ''))
         });
-        row.appendChild(editBtn);
-      }
-
-      if(isAdmin || isOwn){
-        const del = document.createElement('button');
-        del.className = 'msg-del';
-        del.textContent = '🗑';
-        del.title = 'حذف الرسالة';
-        del.addEventListener('click', async ()=>{
-          try{ await deleteDoc(doc(db,'chatRooms',currentRoom,'messages',docSnap.id)); }catch(e){}
-        });
-        row.appendChild(del);
-      }
+        if(isOwn && !m.type){
+          actions.push({
+            icon:'✏️', label:'تعديل',
+            onClick: ()=>{
+              const editBox = document.createElement('div');
+              editBox.className = 'edit-box';
+              const input = document.createElement('input');
+              input.type = 'text';
+              input.value = m.text || '';
+              input.maxLength = 900;
+              const saveBtn = document.createElement('button');
+              saveBtn.type = 'button';
+              saveBtn.textContent = 'حفظ';
+              const cancelBtn = document.createElement('button');
+              cancelBtn.type = 'button';
+              cancelBtn.className = 'cancel-edit';
+              cancelBtn.textContent = 'إلغاء';
+              editBox.appendChild(input);
+              editBox.appendChild(saveBtn);
+              editBox.appendChild(cancelBtn);
+              body.replaceChild(editBox, bubble);
+              input.focus();
+              async function save(){
+                const newText = input.value.trim();
+                if(!newText) return;
+                try{
+                  await updateDoc(doc(db,'chatRooms',currentRoom,'messages',docSnap.id), {
+                    text: newText, editedAt: serverTimestamp()
+                  });
+                }catch(e){}
+              }
+              saveBtn.addEventListener('click', save);
+              input.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); save(); } });
+              cancelBtn.addEventListener('click', ()=>{ body.replaceChild(bubble, editBox); });
+            }
+          });
+        }
+        if(isOwn || isAdmin){
+          actions.push({
+            icon:'🗑', label:'حذف', danger:true,
+            onClick: async ()=>{ try{ await deleteDoc(doc(db,'chatRooms',currentRoom,'messages',docSnap.id)); }catch(e){} }
+          });
+        }
+        openActionsMenu(bubble, actions);
+      });
 
       messagesEl.appendChild(row);
     });
@@ -371,15 +648,18 @@ composer.addEventListener('submit', async (e)=>{
   if(!text || !currentUser || !currentProfile) return;
   sendBtn.disabled = true;
   try{
-    await addDoc(collection(db, 'chatRooms', currentRoom, 'messages'), {
+    const payload = {
       uid: currentUser.uid,
       name: currentProfile.name,
       photoURL: currentProfile.photoURL,
       verified: currentProfile.verified === true,
       text: text,
       createdAt: serverTimestamp()
-    });
+    };
+    if(replyingTo) payload.replyTo = replyingTo;
+    await addDoc(collection(db, 'chatRooms', currentRoom, 'messages'), payload);
     msgInput.value = '';
+    clearReply();
   }catch(err){
     alert('حصلت مشكلة في إرسال الرسالة، جرب تاني.');
   }finally{
