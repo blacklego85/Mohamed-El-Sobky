@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<script>
+(function(){
+  try{
+    var saved = localStorage.getItem('theme');
+    var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if(theme === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); }
+  }catch(e){}
+})();
+</script>
+<title>سر الفرق بين الفاعل ونائب الفاعل في 3 دقايق | مدونة أ. محمد السبكي</title>
+<meta name="description" content="واحدة من أكتر نقط النحو اللي بتلخبط الطلاب، وهنا هتفهمها بطريقة مبسطة تخليك متلخبطش تاني.">
+<meta property="og:title" content="سر الفرق بين الفاعل ونائب الفاعل في 3 دقايق">
+<meta property="og:description" content="واحدة من أكتر نقط النحو اللي بتلخبط الطلاب، وهنا هتفهمها بطريقة مبسطة تخليك متلخبطش تاني.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mohamed-el-sobky.vercel.app/blog/naeb-alfail.html">
+<link rel="canonical" href="https://mohamed-el-sobky.vercel.app/blog/naeb-alfail.html">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#11172A;--ink-2:#1B2440;--ink-3:#232F55;
+  --parchment:#F7F1E1;--parchment-2:#EEE3C4;
+  --gold:#C89B3C;--gold-light:#E7C878;--maroon:#7C2E2E;
+  --text-dark:#241E13;--text-light:#F3ECD9;
+  --page-bg:var(--parchment);--card-bg:#ffffff;--card-bg-2:var(--parchment-2);
+  --text-primary:var(--text-dark);--text-muted:#4a4636;--text-muted-2:#8a8064;
+  --border-soft:#e8ddc0;--footer-bg:#0C1120;--footer-text:#B8B097;
+  color-scheme:light;
+}
+html[data-theme="dark"]{
+  --page-bg:#0d1220;--card-bg:#1B2440;--card-bg-2:#232F55;
+  --text-primary:#F3ECD9;--text-muted:#B8B097;--text-muted-2:#a49c83;
+  --border-soft:rgba(243,236,217,0.12);--footer-bg:#070a14;--footer-text:#94916f;
+  color-scheme:dark;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Cairo',sans-serif;background:var(--page-bg);color:var(--text-primary);line-height:1.9;transition:background .35s ease,color .35s ease;overflow-x:hidden;}
+h1,h2,.display{font-family:'Amiri',serif;}
+a{text-decoration:none;}
+.container{max-width:820px;margin:0 auto;padding:0 max(20px,env(safe-area-inset-right,0px)) 0 max(20px,env(safe-area-inset-left,0px));}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001s !important;animation-iteration-count:1 !important;transition-duration:.001s !important;scroll-behavior:auto !important;}}
+
+.top-bar{background:var(--ink);padding:calc(16px + env(safe-area-inset-top,0px)) 0 16px;position:sticky;top:0;z-index:200;}
+.top-bar .container{max-width:1080px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.logo{font-family:'Amiri',serif;font-size:clamp(17px,3vw,20px);color:var(--text-light);display:flex;align-items:center;gap:6px;}
+.logo span{color:var(--gold);}
+.top-actions{display:flex;align-items:center;gap:10px;}
+.back-link{color:var(--gold);font-size:clamp(12px,2vw,14px);white-space:nowrap;}
+.theme-toggle{width:38px;height:38px;border-radius:50%;background:var(--ink-2);border:1px solid rgba(200,155,60,0.3);color:var(--gold);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex:none;transition:transform .3s ease,background .3s ease;}
+.theme-toggle:hover{transform:rotate(20deg);background:var(--gold);color:var(--ink);}
+
+.p-hero{position:relative;overflow:hidden;padding:clamp(40px,7vw,64px) 0 clamp(46px,8vw,70px);background:radial-gradient(circle at 80% 20%,#1c2650 0%,var(--ink) 55%),var(--ink);background-size:140% 140%;animation:heroShift 16s ease-in-out infinite;text-align:center;color:var(--text-light);}
+@keyframes heroShift{0%,100%{background-position:0% 0%;}50%{background-position:60% 40%;}}
+.p-hero::before{content:"";position:absolute;inset:0;opacity:.08;pointer-events:none;background-image:repeating-linear-gradient(45deg,var(--gold) 0,var(--gold) 1px,transparent 1px,transparent 60px),repeating-linear-gradient(-45deg,var(--gold) 0,var(--gold) 1px,transparent 1px,transparent 60px);}
+.p-letters{position:absolute;inset:0;pointer-events:none;}
+.p-letters span{position:absolute;font-family:'Amiri',serif;color:var(--gold);opacity:0;animation:floatUp linear infinite;}
+@keyframes floatUp{0%{opacity:0;transform:translateY(0) rotate(0deg);}10%{opacity:.3;}85%{opacity:.15;}100%{opacity:0;transform:translateY(-380px) rotate(20deg);}}
+.p-hero-inner{position:relative;z-index:2;}
+.tag{display:inline-block;background:var(--gold);color:var(--ink);font-size:12px;font-weight:700;padding:6px 16px;border-radius:100px;margin-bottom:16px;}
+.p-hero h1{font-size:clamp(24px,4.4vw,38px);line-height:1.4;max-width:680px;margin:0 auto;}
+.meta-row{display:flex;gap:14px;justify-content:center;margin-top:18px;color:#B8B097;font-size:13px;flex-wrap:wrap;}
+
+.p-body{padding:clamp(40px,7vw,64px) 0 clamp(60px,9vw,90px);}
+.lead{font-size:clamp(15.5px,2.2vw,17px);color:var(--text-primary);font-weight:600;margin-bottom:30px;line-height:2;}
+.art-section{margin-bottom:28px;}
+.art-section h2{font-size:clamp(18px,2.6vw,22px);color:var(--maroon);margin-bottom:10px;}
+html[data-theme="dark"] .art-section h2{color:var(--gold-light);}
+.art-section p{color:var(--text-muted);font-size:15px;line-height:2;}
+
+.takeaway-box{background:var(--card-bg);border:1px solid var(--border-soft);border-radius:18px;padding:26px;margin:34px 0;box-shadow:0 8px 24px rgba(36,30,19,0.06);}
+.takeaway-box h3{font-family:'Amiri',serif;color:var(--gold);font-size:17px;margin-bottom:14px;}
+.takeaway-box ul{list-style:none;display:grid;gap:10px;}
+.takeaway-box li{color:var(--text-primary);font-size:14.5px;display:flex;gap:10px;align-items:flex-start;}
+.takeaway-box li::before{content:"✓";color:var(--gold);font-weight:700;flex:none;}
+
+.share-row{display:flex;align-items:center;gap:10px;margin:34px 0;flex-wrap:wrap;}
+.share-label{font-size:13px;color:var(--text-muted-2);font-weight:700;}
+.share-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;transition:transform .25s ease;border:1px solid var(--border-soft);color:var(--text-primary);cursor:pointer;background:var(--card-bg);}
+.share-btn:hover{transform:translateY(-3px);}
+
+.cta-box{background:linear-gradient(160deg,var(--ink-2),var(--ink));border-radius:20px;padding:32px;text-align:center;color:var(--text-light);margin:40px 0;}
+.cta-box h3{font-family:'Amiri',serif;font-size:20px;margin-bottom:10px;}
+.cta-box p{color:#C9C2AA;font-size:14px;margin-bottom:20px;}
+.cta-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.cbtn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:100px;font-weight:700;font-size:14px;transition:transform .25s ease;}
+.cbtn-gold{background:linear-gradient(135deg,var(--gold-light),var(--gold));color:var(--ink);}
+.cbtn-ghost{border:1.5px solid rgba(243,236,217,0.35);color:var(--text-light);}
+.cbtn:hover{transform:translateY(-3px);}
+
+.related{margin-top:50px;}
+.related h3{font-family:'Amiri',serif;font-size:19px;color:var(--text-primary);margin-bottom:18px;}
+.related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.related-card{background:var(--card-bg);border:1px solid var(--border-soft);border-radius:14px;padding:18px;transition:transform .25s ease,box-shadow .25s ease;}
+.related-card:hover{transform:translateY(-6px);box-shadow:0 14px 30px rgba(36,30,19,0.1);}
+.related-card .rtag{font-size:11px;color:var(--gold);font-weight:700;}
+.related-card h4{font-family:'Amiri',serif;font-size:14.5px;color:var(--text-primary);margin-top:6px;line-height:1.6;}
+
+footer{background:var(--footer-bg);color:var(--footer-text);text-align:center;padding:26px 0 calc(26px + env(safe-area-inset-bottom,0px));font-size:13px;}
+footer a{color:var(--gold);}
+footer .addr{font-size:12px;margin-bottom:8px;opacity:.85;}
+
+@media(max-width:760px){
+  .related-grid{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .cta-box{padding:24px 18px;}
+  .cta-actions{flex-direction:column;}
+  .cbtn{justify-content:center;}
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="container">
+    <a href="../index.html" class="logo">أ<span>.</span> محمد السبكي</a>
+    <div class="top-actions">
+      <a href="../blog.html" class="back-link">→ كل المقالات</a>
+      <button class="theme-toggle" id="themeToggle" title="تبديل الوضع الليلي/النهاري">🌙</button>
+    </div>
+  </div>
+</div>
+
+<section class="p-hero">
+  <div class="p-letters" id="pLetters"></div>
+  <div class="container p-hero-inner">
+    <span class="tag">نحو</span>
+    <h1>سر الفرق بين الفاعل ونائب الفاعل في 3 دقايق</h1>
+    <div class="meta-row"><span>📖 4 دقايق قراءة</span><span>·</span><span>✍️ أ. محمد السبكي</span></div>
+  </div>
+</section>
+
+<div class="p-body">
+  <div class="container">
+    <p class="lead">الفاعل ونائب الفاعل بيشتغلوا في نفس "المكان" من الجملة (بعد الفعل مباشرة ومرفوعين)، وده اللي بيسبب اللخبطة. بس الفرق بسيط جدًا لو فهمته من الأساس.</p>
+
+    <div class="art-section"><h2>مين اللي بيعمل الفعل فعلاً؟</h2><p>الفاعل هو اللي عمل الفعل بنفسه: "كتب الطالبُ الدرسَ" - الطالب هو اللي كتب. نائب الفاعل بيظهر لما نشيل الفاعل الأصلي من الجملة ونخلي المفعول يوخد مكانه: "كُتِبَ الدرسُ" - الدرس مكتبش نفسه، هو بس أخد مكان الفاعل.</p></div>
+<div class="art-section"><h2>العلامة اللي تميز الاتنين</h2><p>لاحظ إن الفعل مع نائب الفاعل بيتغير شكله (بيتبنى للمجهول): "كتب" بتبقى "كُتِب"، "شرح" بتبقى "شُرِح". لو شفت الفعل مبني للمجهول، دور على نائب فاعل مش فاعل.</p></div>
+<div class="art-section"><h2>مثال يفرق معاك</h2><p>قارن بين: "فتح الطالبُ البابَ" (فاعل حقيقي عمل الفعل) و"فُتِح البابُ" (محدش قال مين فتحه، البس أصبح موضوع الجملة).</p></div>
+
+    <div class="takeaway-box">
+      <h3>🎯 خلاصة سريعة</h3>
+      <ul>
+        <li>الفاعل بيعمل الفعل، نائب الفاعل بياخد مكان مفعول اتشال</li>
+<li>الفعل مع نائب الفاعل بيتبنى للمجهول</li>
+<li>دايمًا اتأكد من شكل الفعل الأول قبل ما تحدد نوع الاسم بعده</li>
+      </ul>
+    </div>
+
+    <div class="share-row">
+      <span class="share-label">شارك المقالة:</span>
+      <a class="share-btn" target="_blank" href="https://wa.me/?text=%D8%B3%D8%B1%20%D8%A7%D9%84%D9%81%D8%B1%D9%82%20%D8%A8%D9%8A%D9%86%20%D8%A7%D9%84%D9%81%D8%A7%D8%B9%D9%84%20%D9%88%D9%86%D8%A7%D8%A6%D8%A8%20%D8%A7%D9%84%D9%81%D8%A7%D8%B9%D9%84%20%D9%81%D9%8A%203%20%D8%AF%D9%82%D8%A7%D9%8A%D9%82%20-%20https%3A//mohamed-el-sobky.vercel.app/blog/naeb-alfail.html">💬</a>
+      <a class="share-btn" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://mohamed-el-sobky.vercel.app/blog/naeb-alfail.html">f</a>
+      <button class="share-btn" id="copyLinkBtn" title="نسخ الرابط">🔗</button>
+    </div>
+
+    <div class="cta-box">
+      <h3>عايز تفهم الدرس ده بالتفصيل مع تدريبات كتير؟</h3>
+      <p>اشترك في كورس نحو مع أ. محمد السبكي، وابدأ تفهم اللغة العربية صح.</p>
+      <div class="cta-actions">
+        <a href="../index.html#courses" class="cbtn cbtn-gold">شوف الكورسات</a>
+        <a href="https://wa.me/201007367432" target="_blank" class="cbtn cbtn-ghost">تواصل واتساب</a>
+      </div>
+    </div>
+
+    <div class="related">
+      <h3>مقالات تانية ممكن تعجبك</h3>
+      <div class="related-grid">
+        <a class="related-card" href="balagha-mesh-riyadiyat.html"><div class="rtag">بلاغة</div><h4>البلاغة مش رياضيات: إزاي تحس بالصورة الجمالية في أي نص؟</h4></a>
+<a class="related-card" href="tashbih-wa-istiara.html"><div class="rtag">بلاغة</div><h4>الاستعارة والتشبيه.. إيه الفرق اللي هيفرق معاك في الامتحان؟</h4></a>
+<a class="related-card" href="akhtaa-imlaiyya.html"><div class="rtag">إملاء</div><h4>5 أخطاء إملائية بيقع فيها 90% من الطلاب (وإزاي تتجنبها)</h4></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="addr">📍 محافظة البحيرة – دمنهور، آخر شارع شركة WE، بجوار منطقة الفجالة</div>
+  © 2026 أ. محمد السبكي — <a href="../index.html">الرجوع للصفحة الرئيسية</a> · <a href="../privacy.html">سياسة الخصوصية</a>
+</footer>
+
+<script>
+const themeToggle=document.getElementById('themeToggle');
+function applyThemeIcon(){const isDark=document.documentElement.getAttribute('data-theme')==='dark';themeToggle.textContent=isDark?'☀️':'🌙';}
+applyThemeIcon();
+themeToggle.addEventListener('click',()=>{
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  if(isDark){document.documentElement.removeAttribute('data-theme');localStorage.setItem('theme','light');}
+  else{document.documentElement.setAttribute('data-theme','dark');localStorage.setItem('theme','dark');}
+  applyThemeIcon();
+});
+
+const arabicLetters=['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر'];
+const pLettersLayer=document.getElementById('pLetters');
+for(let i=0;i<10;i++){
+  const s=document.createElement('span');
+  s.textContent=arabicLetters[Math.floor(Math.random()*arabicLetters.length)];
+  s.style.right=Math.random()*100+'%';
+  s.style.bottom='-30px';
+  s.style.fontSize=(14+Math.random()*16)+'px';
+  s.style.animationDuration=(9+Math.random()*9)+'s';
+  s.style.animationDelay=(Math.random()*9)+'s';
+  pLettersLayer.appendChild(s);
+}
+
+document.getElementById('copyLinkBtn').addEventListener('click', async ()=>{
+  try{
+    await navigator.clipboard.writeText(window.location.href);
+    const btn=document.getElementById('copyLinkBtn');
+    const old=btn.textContent; btn.textContent='✓';
+    setTimeout(()=>btn.textContent=old,1500);
+  }catch(e){}
+});
+</script>
+</body>
+</html>
