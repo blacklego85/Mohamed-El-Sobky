@@ -122,6 +122,17 @@ button{font-family:'Cairo',sans-serif;cursor:pointer;border:none;}
 .section-sub{font-size:clamp(15px,2vw,17px);color:var(--text-muted);max-width:620px;line-height:1.9;}
 section{padding:clamp(64px,10vw,110px) 0;position:relative;}
 .reveal{opacity:0;transform:translateY(36px);transition:opacity .8s ease,transform .8s ease;}
+.course-grid .reveal:nth-child(1),.video-grid .reveal:nth-child(1),.blog-teaser-grid .reveal:nth-child(1),.compass .reveal:nth-child(1){transition-delay:0s;}
+.course-grid .reveal:nth-child(2),.video-grid .reveal:nth-child(2),.blog-teaser-grid .reveal:nth-child(2),.compass .reveal:nth-child(2){transition-delay:.1s;}
+.course-grid .reveal:nth-child(3),.video-grid .reveal:nth-child(3),.blog-teaser-grid .reveal:nth-child(3),.compass .reveal:nth-child(3){transition-delay:.2s;}
+.course-grid .reveal:nth-child(4),.video-grid .reveal:nth-child(4),.compass .reveal:nth-child(4){transition-delay:.3s;}
+.course-grid .reveal:nth-child(5),.video-grid .reveal:nth-child(5){transition-delay:.4s;}
+.course-grid .reveal:nth-child(6),.video-grid .reveal:nth-child(6){transition-delay:.5s;}
+.faq-list .faq-item:nth-child(1){transition-delay:0s;}
+.faq-list .faq-item:nth-child(2){transition-delay:.08s;}
+.faq-list .faq-item:nth-child(3){transition-delay:.16s;}
+.faq-list .faq-item:nth-child(4){transition-delay:.24s;}
+.faq-list .faq-item:nth-child(5){transition-delay:.32s;}
 .reveal.in-view{opacity:1;transform:translateY(0);}
 
 /* progress bar */
@@ -153,6 +164,15 @@ section{padding:clamp(64px,10vw,110px) 0;position:relative;}
   padding:16px 32px;border-radius:100px;font-weight:700;font-size:16px;
   transition:transform .25s ease,box-shadow .25s ease;
 }
+.btn-gold,.nav-cta,.enroll-btn,.submit-btn{position:relative;overflow:hidden;isolation:isolate;}
+.btn-gold::before,.nav-cta::before,.enroll-btn::before,.submit-btn::before{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,0.5) 45%,transparent 70%);
+  transform:translateX(-140%);
+}
+.btn-gold:hover::before,.nav-cta:hover::before,.enroll-btn:hover::before,.submit-btn:hover::before{
+  transform:translateX(140%);transition:transform .85s ease;
+}
 .btn-gold{background:linear-gradient(135deg,var(--gold-light),var(--gold));color:var(--ink);box-shadow:0 12px 30px rgba(200,155,60,0.35);}
 .btn-gold:hover{transform:translateY(-3px);box-shadow:0 18px 36px rgba(200,155,60,0.45);}
 .btn-ghost{border:1.5px solid rgba(243,236,217,0.4);color:var(--text-light);}
@@ -168,16 +188,48 @@ header.scrolled{background:rgba(17,23,42,0.92);backdrop-filter:blur(10px);paddin
 .nav-wrap{display:flex;align-items:center;justify-content:space-between;}
 .logo{display:flex;align-items:center;gap:10px;color:var(--text-light);font-family:'Amiri',serif;font-size:22px;font-weight:700;}
 .logo span{color:var(--gold);}
-.nav-links{display:flex;gap:34px;}
-.nav-links a{color:var(--text-light);font-size:15px;font-weight:600;position:relative;padding:6px 0;}
+.mlink{opacity:0;transform:translateY(16px);}
+#mobileMenu.open .mlink{animation:mlinkIn .5s ease forwards;}
+#mobileMenu.open .mlink:nth-child(1){animation-delay:.05s;}
+#mobileMenu.open .mlink:nth-child(2){animation-delay:.1s;}
+#mobileMenu.open .mlink:nth-child(3){animation-delay:.15s;}
+#mobileMenu.open .mlink:nth-child(4){animation-delay:.2s;}
+#mobileMenu.open .mlink:nth-child(5){animation-delay:.25s;}
+#mobileMenu.open .mlink:nth-child(6){animation-delay:.3s;}
+#mobileMenu.open .mlink:nth-child(7){animation-delay:.35s;}
+#mobileMenu.open .mlink:nth-child(8){animation-delay:.4s;}
+#mobileMenu.open .mlink:nth-child(9){animation-delay:.45s;}
+@keyframes mlinkIn{to{opacity:1;transform:translateY(0);}}
+.nav-links{display:flex;gap:24px;align-items:center;}
+.nav-links a{color:var(--text-light);font-size:14px;font-weight:600;position:relative;padding:6px 0;white-space:nowrap;}
 .nav-links a::after{content:"";position:absolute;bottom:0;right:0;width:0;height:2px;background:var(--gold);transition:width .3s ease;}
 .nav-links a:hover::after{width:100%;}
 .nav-links a.active{color:var(--gold);}
 .nav-links a.active::after{width:100%;}
-.nav-cta{background:var(--gold);color:var(--ink);padding:11px 24px;border-radius:100px;font-weight:700;font-size:14px;}
-.nav-login{color:var(--text-light);border:1.5px solid rgba(243,236,217,0.35);padding:9px 20px;border-radius:100px;font-weight:600;font-size:14px;transition:.3s;}
-.nav-login:hover{border-color:var(--gold);color:var(--gold);}
-.nav-actions{display:flex;align-items:center;gap:12px;}
+.nav-dropdown{position:relative;}
+.nav-dropdown-btn{
+  display:flex;align-items:center;gap:5px;color:var(--text-light);font-size:14px;font-weight:600;
+  background:none;border:none;cursor:pointer;font-family:'Cairo',sans-serif;padding:6px 0;
+}
+.nav-dropdown-btn svg{width:12px;height:12px;transition:transform .3s ease;}
+.nav-dropdown.open .nav-dropdown-btn svg{transform:rotate(180deg);}
+.nav-dropdown-menu{
+  position:absolute;top:calc(100% + 14px);left:50%;transform:translateX(-50%) translateY(8px);
+  background:var(--ink-2);border:1px solid rgba(200,155,60,0.2);border-radius:14px;padding:8px;min-width:180px;
+  opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;box-shadow:0 20px 40px rgba(0,0,0,0.35);z-index:50;
+}
+.nav-dropdown.open .nav-dropdown-menu{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+.nav-dropdown-menu a{display:block;padding:10px 14px;border-radius:8px;font-size:14px;color:var(--text-light);transition:background .2s ease;}
+.nav-dropdown-menu a:hover{background:var(--ink-3);color:var(--gold);}
+.nav-login-icon{
+  width:38px;height:38px;border-radius:50%;background:var(--ink-2);border:1px solid rgba(200,155,60,0.3);
+  color:var(--gold);display:flex;align-items:center;justify-content:center;transition:transform .3s ease,background .3s ease;flex:none;
+}
+.nav-login-icon:hover{transform:rotate(-8deg);background:var(--gold);color:var(--ink);}
+.nav-login-icon svg{width:17px;height:17px;}
+.nav-cta{background:var(--gold);color:var(--ink);padding:11px 22px;border-radius:100px;font-weight:700;font-size:14px;white-space:nowrap;}
+.nav-actions{display:flex;align-items:center;gap:10px;}
+
 .theme-toggle{
   width:40px;height:40px;flex:none;border-radius:50%;
   background:rgba(243,236,217,0.08);border:1.5px solid rgba(243,236,217,0.35);
@@ -219,6 +271,11 @@ html[data-theme="dark"] .theme-toggle-mobile .icon-moon{display:block;}
     repeating-linear-gradient(45deg,var(--gold) 0,var(--gold) 1px,transparent 1px,transparent 60px),
     repeating-linear-gradient(-45deg,var(--gold) 0,var(--gold) 1px,transparent 1px,transparent 60px);
 }
+.hero-spotlight{
+  position:absolute;inset:0;pointer-events:none;z-index:1;opacity:0;transition:opacity .4s ease;
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,30%),rgba(200,155,60,0.16),transparent 70%);
+}
+.hero:hover .hero-spotlight{opacity:1;}
 .letters{position:absolute;inset:0;pointer-events:none;}
 .letters span{
   position:absolute;font-family:'Amiri',serif;color:var(--gold);opacity:0;
@@ -235,7 +292,14 @@ html[data-theme="dark"] .theme-toggle-mobile .icon-moon{display:block;}
   font-size:clamp(40px,6vw,74px);color:var(--text-light);line-height:1.25;font-weight:700;
   clip-path:inset(0 0 0 0);
 }
-.hero-title .accent{color:var(--gold);font-style:italic;display:block;}
+.hero-title .accent{
+  background:linear-gradient(90deg,var(--gold) 0%,var(--gold-light) 25%,#fff6df 50%,var(--gold-light) 75%,var(--gold) 100%);
+  background-size:250% auto;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmerText 5s linear infinite;
+  font-style:italic;display:block;
+}
+@keyframes shimmerText{0%{background-position:0% center;}100%{background-position:250% center;}}
 .hero-desc{color:#C9C2AA;font-size:18px;line-height:2;margin:26px 0 38px;max-width:520px;}
 .hero-actions{display:flex;gap:16px;flex-wrap:wrap;}
 .hero-stats{display:flex;gap:0;margin-top:64px;border-top:1px solid rgba(243,236,217,0.15);padding-top:30px;}
@@ -317,12 +381,17 @@ html[data-theme="dark"] .theme-toggle-mobile .icon-moon{display:block;}
   gap:22px;max-width:840px;margin:70px auto 0;place-items:center;
 }
 .branch-card{
-  background:var(--ink-2);border:1px solid rgba(200,155,60,0.15);
+  position:relative;background:var(--ink-2);border:1px solid rgba(200,155,60,0.15);
   border-radius:18px;padding:26px;width:100%;max-width:280px;
-  transition:transform .3s ease,border-color .3s ease,background .3s ease;
+  transition:transform .3s ease,border-color .3s ease,background .3s ease,box-shadow .3s ease;
   cursor:default;
 }
-.branch-card:hover{transform:translateY(-8px);border-color:var(--gold);background:var(--ink-3);}
+.branch-card::before{
+  content:attr(data-num);position:absolute;top:-12px;left:-12px;width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold));color:var(--ink);font-weight:800;font-size:13px;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px rgba(0,0,0,0.35);font-family:'Cairo',sans-serif;
+}
+.branch-card:hover{transform:translateY(-8px);border-color:var(--gold);background:var(--ink-3);box-shadow:0 20px 40px rgba(0,0,0,0.3);}
 .branch-card h3{font-size:20px;color:var(--gold);margin-bottom:10px;}
 .branch-card p{font-size:14px;color:#C9C2AA;line-height:1.8;}
 .b-top{grid-area:top;} .b-left{grid-area:left;} .b-right{grid-area:right;} .b-bottom{grid-area:bottom;}
@@ -331,12 +400,27 @@ html[data-theme="dark"] .theme-toggle-mobile .icon-moon{display:block;}
   background:radial-gradient(circle,var(--ink-3),var(--ink-2));
   display:flex;align-items:center;justify-content:center;
   border:1px solid rgba(200,155,60,0.3);
-  animation:spin 60s linear infinite;
+  animation:spin 60s linear infinite,corePulse 3.4s ease-in-out infinite;
+}
+@keyframes corePulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(200,155,60,0.28);}
+  50%{box-shadow:0 0 0 18px rgba(200,155,60,0);}
 }
 .compass-core span{font-family:'Amiri',serif;color:var(--gold);font-size:30px;font-weight:700;animation:spin 60s linear infinite reverse;}
 @media(max-width:760px){
-  .compass{grid-template-columns:1fr;grid-template-areas:"top" "left" "center" "right" "bottom";}
-  .compass-core{margin:10px 0;}
+  .compass{
+    grid-template-columns:1fr 1fr;
+    grid-template-areas:
+      "center center"
+      "top left"
+      "right bottom";
+    gap:18px;
+  }
+  .compass-core{margin:0 auto 8px;}
+  .branch-card{max-width:none;padding:22px 18px;}
+}
+@media(max-width:480px){
+  .compass{grid-template-columns:1fr;grid-template-areas:"center" "top" "left" "right" "bottom";}
 }
 
 /* ===== STAGES + COURSES ===== */
@@ -353,7 +437,7 @@ html[data-theme="dark"] .theme-toggle-mobile .icon-moon{display:block;}
   transition:transform .3s ease,box-shadow .3s ease,background .35s ease;display:none;flex-direction:column;
 }
 .course-card.show{display:flex;}
-.course-card:hover{transform:translateY(-10px);box-shadow:0 22px 44px rgba(36,30,19,0.16);}
+.course-card:hover{transform:translateY(-10px);box-shadow:0 22px 44px rgba(36,30,19,0.16),0 0 0 2px rgba(200,155,60,0.35);}
 .course-top{background:linear-gradient(135deg,var(--ink-2),var(--ink));padding:26px;color:var(--text-light);position:relative;}
 .course-top .tag{font-size:12px;background:var(--gold);color:var(--ink);padding:5px 12px;border-radius:100px;font-weight:700;display:inline-block;margin-bottom:14px;}
 .course-top h3{font-family:'Amiri',serif;font-size:22px;}
@@ -510,11 +594,28 @@ body.sticky-active .back-top{bottom:calc(88px + env(safe-area-inset-bottom,0px))
   .sticky-cta .btn{padding:10px 16px;font-size:13px;width:auto;}
 }
 
+/* ===== LATEST ARTICLES ===== */
+.latest-blog{background:var(--parchment);}
+.blog-teaser-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:50px;}
+.blog-teaser-card{background:#fff;border:1px solid rgba(200,155,60,0.15);border-radius:18px;padding:24px;transition:transform .3s ease,box-shadow .3s ease;box-shadow:0 8px 24px rgba(36,30,19,0.05);}
+.blog-teaser-card:hover{transform:translateY(-8px);box-shadow:0 20px 40px rgba(36,30,19,0.12),0 0 0 2px rgba(200,155,60,0.3);}
+.bt-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.bt-tag{font-size:11px;font-weight:700;color:var(--gold);background:var(--parchment-2);padding:5px 12px;border-radius:100px;}
+.bt-read{font-size:12px;color:#8a8064;}
+.blog-teaser-card h3{font-family:'Amiri',serif;font-size:17px;color:var(--text-dark);line-height:1.6;margin-bottom:10px;}
+.blog-teaser-card p{font-size:13.5px;color:#5b5140;line-height:1.8;margin-bottom:14px;}
+.bt-more{font-size:13px;color:var(--maroon);font-weight:700;}
+.blog-cta-row{text-align:center;margin-top:40px;}
+@media(max-width:900px){.blog-teaser-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.blog-teaser-grid{grid-template-columns:1fr;}}
+
+@media(max-width:1180px){
+  .nav-links,.nav-actions{display:none;}
+  .burger{display:flex;}
+}
 @media(max-width:900px){
   .hero-grid,.about-grid,.contact-grid{grid-template-columns:1fr;}
   .hero-emblem{order:-1;transform:scale(.7);margin-bottom:-40px;}
-  .nav-links,.nav-actions{display:none;}
-  .burger{display:flex;}
 }
 @media(max-width:600px){
   .container{padding:0 18px;}
@@ -560,15 +661,25 @@ body.sticky-active .back-top{bottom:calc(88px + env(safe-area-inset-bottom,0px))
       <a href="#branches">الأقسام</a>
       <a href="#courses">الكورسات</a>
       <a href="#videos">فيديوهات</a>
-      <a href="#testimonials">آراء الطلاب</a>
-      <a href="#faq">الأسئلة الشائعة</a>
+      <div class="nav-dropdown" id="navDropdown">
+        <button class="nav-dropdown-btn" id="navDropdownBtn">المزيد
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="#testimonials">آراء الطلاب</a>
+          <a href="#faq">الأسئلة الشائعة</a>
+          <a href="blog.html">المدونة</a>
+        </div>
+      </div>
     </nav>
     <div class="nav-actions">
       <button class="theme-toggle" id="themeToggle" title="تبديل الوضع الليلي/الفاتح" aria-label="تبديل الوضع الليلي والفاتح">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
         <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       </button>
-      <a href="login.html" class="nav-login">تسجيل الدخول</a>
+      <a href="login.html" class="nav-login-icon" title="تسجيل الدخول" aria-label="تسجيل الدخول">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </a>
       <a href="#contact" class="nav-cta">تواصل معايا</a>
     </div>
     <button class="burger" id="burger"><span></span><span></span><span></span></button>
@@ -583,6 +694,7 @@ body.sticky-active .back-top{bottom:calc(88px + env(safe-area-inset-bottom,0px))
   <a href="#courses" class="mlink" style="color:var(--text-light);font-family:'Amiri',serif;font-size:24px;">الكورسات</a>
   <a href="#videos" class="mlink" style="color:var(--text-light);font-family:'Amiri',serif;font-size:24px;">فيديوهات</a>
   <a href="#faq" class="mlink" style="color:var(--text-light);font-family:'Amiri',serif;font-size:24px;">الأسئلة الشائعة</a>
+  <a href="blog.html" class="mlink" style="color:var(--text-light);font-family:'Amiri',serif;font-size:24px;">المدونة</a>
   <a href="#contact" class="mlink" style="color:var(--gold);font-family:'Amiri',serif;font-size:24px;">تواصل معايا</a>
   <a href="login.html" class="mlink" style="color:var(--text-light);border:1.5px solid rgba(243,236,217,0.35);padding:10px 26px;border-radius:100px;font-family:'Cairo',sans-serif;font-size:15px;">تسجيل الدخول</a>
   <button class="theme-toggle-mobile" id="themeToggleMobile">
@@ -594,6 +706,7 @@ body.sticky-active .back-top{bottom:calc(88px + env(safe-area-inset-bottom,0px))
 
 <!-- ===== HERO ===== -->
 <section class="hero" id="home">
+  <div class="hero-spotlight" id="heroSpotlight"></div>
   <div class="letters" id="lettersLayer"></div>
   <div class="container hero-grid">
     <div>
@@ -654,11 +767,11 @@ body.sticky-active .back-top{bottom:calc(88px + env(safe-area-inset-bottom,0px))
       <p class="section-sub" style="margin:0 auto;">كل فرع من فروع اللغة العربية ليه أسلوب شرح مختلف يناسب طبيعته.</p>
     </div>
     <div class="compass">
-      <div class="branch-card b-top reveal"><h3>النحو والصرف</h3><p>القاعدة زي ما هي، مبسّطة بمنطق وترابط بين الدروس، مش حفظ عشوائي.</p></div>
-      <div class="branch-card b-left reveal"><h3>البلاغة</h3><p>تفهم الصورة الجمالية للنص وتحسّها، مش تحفظ تعريفها وتنساها بعد الامتحان.</p></div>
+      <div class="branch-card b-top reveal" data-num="01"><h3>النحو والصرف</h3><p>القاعدة زي ما هي، مبسّطة بمنطق وترابط بين الدروس، مش حفظ عشوائي.</p></div>
+      <div class="branch-card b-left reveal" data-num="02"><h3>البلاغة</h3><p>تفهم الصورة الجمالية للنص وتحسّها، مش تحفظ تعريفها وتنساها بعد الامتحان.</p></div>
       <div class="compass-core"><span>ض</span></div>
-      <div class="branch-card b-right reveal"><h3>الأدب والنصوص</h3><p>تحليل النصوص والعصور الأدبية بمنهجية واضحة تخليك تفهم أي نص جديد بنفسك.</p></div>
-      <div class="branch-card b-bottom reveal"><h3>التعبير والإملاء</h3><p>تكتب موضوع تعبير متكامل الأفكار، وتتقن قواعد الإملاء بدون أخطاء تنقصك درجات.</p></div>
+      <div class="branch-card b-right reveal" data-num="03"><h3>الأدب والنصوص</h3><p>تحليل النصوص والعصور الأدبية بمنهجية واضحة تخليك تفهم أي نص جديد بنفسك.</p></div>
+      <div class="branch-card b-bottom reveal" data-num="04"><h3>التعبير والإملاء</h3><p>تكتب موضوع تعبير متكامل الأفكار، وتتقن قواعد الإملاء بدون أخطاء تنقصك درجات.</p></div>
     </div>
   </div>
 </section>
@@ -780,6 +893,40 @@ body.sticky-active .back-top{bottom:calc(88px + env(safe-area-inset-bottom,0px))
   </div>
 </section>
 
+<!-- ===== LATEST ARTICLES ===== -->
+<section class="latest-blog" id="blog-teaser">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <div class="eyebrow" style="justify-content:center;">مدونة اللغة العربية</div>
+      <h2 class="section-title">أحدث المقالات</h2>
+      <p class="section-sub" style="margin:0 auto;">نصايح وشروحات مبسطة في النحو والبلاغة والأدب، تقرأها في دقايق.</p>
+    </div>
+    <div class="blog-teaser-grid">
+      <a href="blog/qalaq-alimtihan.html" class="blog-teaser-card reveal">
+        <div class="bt-top"><span class="bt-tag">مذاكرة</span><span class="bt-read">📖 5 دقايق</span></div>
+        <h3>قلق الامتحان: إزاي تتعامل مع رهبة امتحان اللغة العربية؟</h3>
+        <p>مش بس المذاكرة هي اللي بتفرق في النتيجة، طريقة تعاملك مع القلق يوم الامتحان مهمة بنفس القدر.</p>
+        <span class="bt-more">اقرأ المقالة ←</span>
+      </a>
+      <a href="blog/akhtaa-imlaiyya.html" class="blog-teaser-card reveal">
+        <div class="bt-top"><span class="bt-tag">إملاء</span><span class="bt-read">📖 4 دقايق</span></div>
+        <h3>5 أخطاء إملائية بيقع فيها 90% من الطلاب</h3>
+        <p>أخطاء إملائية بسيطة ممكن تكلفك درجات في أي مادة مش بس العربي. اعرفها وابعد عنها للأبد.</p>
+        <span class="bt-more">اقرأ المقالة ←</span>
+      </a>
+      <a href="blog/muqaddimat-tabir.html" class="blog-teaser-card reveal">
+        <div class="bt-top"><span class="bt-tag">تعبير</span><span class="bt-read">📖 6 دقايق</span></div>
+        <h3>إزاي تكتب مقدمة موضوع تعبير تخطف نظر المصحح؟</h3>
+        <p>أول سطرين في موضوع التعبير بيحددوا انطباع المصحح عن الموضوع كله. اتعلم إزاي تكتبهم صح.</p>
+        <span class="bt-more">اقرأ المقالة ←</span>
+      </a>
+    </div>
+    <div class="blog-cta-row reveal">
+      <a href="blog.html" class="btn" style="background:var(--ink);color:var(--gold);">شوف كل المقالات (14)</a>
+    </div>
+  </div>
+</section>
+
 <!-- ===== FAQ ===== -->
 <section class="faq" id="faq">
   <div class="container">
@@ -824,6 +971,7 @@ body.sticky-active .back-top{bottom:calc(88px + env(safe-area-inset-bottom,0px))
       <div style="margin-top:36px;">
         <a class="info-card reveal" href="mailto:elsopky44@gmail.com"><i>@</i><div><h4>الإيميل</h4><p>elsopky44@gmail.com</p></div></a>
         <a class="info-card reveal" href="https://wa.me/201007367432" target="_blank"><i>☎</i><div><h4>واتساب / تليفون</h4><p>01007367432+</p></div></a>
+        <a class="info-card reveal" href="https://maps.google.com/?q=دمنهور، البحيرة، آخر شارع شركة WE، بجوار الفجالة" target="_blank"><i>📍</i><div><h4>العنوان</h4><p style="font-weight:700;">محافظة البحيرة – دمنهور<br><span style="font-weight:400;font-size:13px;color:#B8B097;">آخر شارع شركة WE، بجوار منطقة الفجالة</span></p></div></a>
       </div>
     </div>
     <form id="contactForm">
@@ -858,7 +1006,8 @@ body.sticky-active .back-top{bottom:calc(88px + env(safe-area-inset-bottom,0px))
         <a href="mailto:elsopky44@gmail.com" title="إيميل">@</a>
       </div>
     </div>
-    <div class="footer-bottom">© 2026 أ. محمد السبكي — جميع الحقوق محفوظة · <a href="privacy.html" style="color:var(--gold);">سياسة الخصوصية وشروط الاستخدام</a></div>
+    <div class="footer-bottom">📍 محافظة البحيرة – دمنهور، آخر شارع شركة WE، بجوار منطقة الفجالة</div>
+    <div class="footer-bottom">© 2026 أ. محمد السبكي — جميع الحقوق محفوظة · <a href="privacy.html" style="color:var(--gold);">سياسة الخصوصية وشروط الاستخدام</a> · <a href="blog.html" style="color:var(--gold);">المدونة</a></div>
   </div>
 </footer>
 
@@ -1009,10 +1158,35 @@ const mobileMenu=document.getElementById('mobileMenu');
 burger.addEventListener('click',()=>{
   const open=mobileMenu.style.display==='flex';
   mobileMenu.style.display=open?'none':'flex';
+  mobileMenu.classList.toggle('open',!open);
 });
-document.querySelectorAll('.mlink').forEach(l=>l.addEventListener('click',()=>{mobileMenu.style.display='none';}));
+document.querySelectorAll('.mlink').forEach(l=>l.addEventListener('click',()=>{mobileMenu.style.display='none';mobileMenu.classList.remove('open');}));
+
+// nav "More" dropdown
+const navDropdown=document.getElementById('navDropdown');
+const navDropdownBtn=document.getElementById('navDropdownBtn');
+navDropdownBtn.addEventListener('click',(e)=>{
+  e.stopPropagation();
+  navDropdown.classList.toggle('open');
+});
+document.addEventListener('click',(e)=>{
+  if(!navDropdown.contains(e.target)) navDropdown.classList.remove('open');
+});
+navDropdown.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>navDropdown.classList.remove('open')));
 
 // floating letters
+// hero cursor spotlight
+const heroSpotlight=document.getElementById('heroSpotlight');
+if(!isTouch && heroSection && heroSpotlight){
+  heroSection.addEventListener('mousemove',(e)=>{
+    const rect=heroSection.getBoundingClientRect();
+    const x=((e.clientX-rect.left)/rect.width)*100;
+    const y=((e.clientY-rect.top)/rect.height)*100;
+    heroSpotlight.style.setProperty('--mx', x+'%');
+    heroSpotlight.style.setProperty('--my', y+'%');
+  });
+}
+
 const arabicLetters=['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض'];
 const layer=document.getElementById('lettersLayer');
 for(let i=0;i<22;i++){

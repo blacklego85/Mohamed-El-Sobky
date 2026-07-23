@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<script>
+(function(){
+  try{
+    var saved = localStorage.getItem('theme');
+    var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if(theme === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); }
+  }catch(e){}
+})();
+</script>
+<title>مدونة اللغة العربية | أ. محمد السبكي</title>
+<meta name="description" content="مقالات ونصائح في النحو والبلاغة والأدب والإملاء والتعبير، وخطط مذاكرة عملية للمرحلتين الإعدادية والثانوية.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#11172A;--ink-2:#1B2440;--ink-3:#232F55;
+  --parchment:#F7F1E1;--parchment-2:#EEE3C4;
+  --gold:#C89B3C;--gold-light:#E7C878;--maroon:#7C2E2E;
+  --text-dark:#241E13;--text-light:#F3ECD9;
+  --page-bg:var(--parchment);--card-bg:#ffffff;--card-bg-2:var(--parchment-2);
+  --text-primary:var(--text-dark);--text-muted:#4a4636;--text-muted-2:#8a8064;
+  --border-soft:#e8ddc0;--footer-bg:#0C1120;--footer-text:#B8B097;
+  color-scheme:light;
+}
+html[data-theme="dark"]{
+  --page-bg:#0d1220;--card-bg:#1B2440;--card-bg-2:#232F55;
+  --text-primary:#F3ECD9;--text-muted:#B8B097;--text-muted-2:#a49c83;
+  --border-soft:rgba(243,236,217,0.12);--footer-bg:#070a14;--footer-text:#94916f;
+  color-scheme:dark;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Cairo',sans-serif;background:var(--page-bg);color:var(--text-primary);line-height:1.9;transition:background .35s ease,color .35s ease;overflow-x:hidden;}
+h1,h2,.display{font-family:'Amiri',serif;}
+a{text-decoration:none;}
+.container{max-width:1120px;margin:0 auto;padding:0 max(20px,env(safe-area-inset-right,0px)) 0 max(20px,env(safe-area-inset-left,0px));}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.in-view{opacity:1;transform:translateY(0);}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001s !important;animation-iteration-count:1 !important;transition-duration:.001s !important;scroll-behavior:auto !important;}}
+
+.top-bar{background:var(--ink);padding:calc(16px + env(safe-area-inset-top,0px)) 0 16px;position:sticky;top:0;z-index:200;}
+.top-bar .container{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.logo{font-family:'Amiri',serif;font-size:clamp(17px,3vw,20px);color:var(--text-light);display:flex;align-items:center;gap:6px;}
+.logo span{color:var(--gold);}
+.top-actions{display:flex;align-items:center;gap:10px;}
+.back-link{color:var(--gold);font-size:clamp(12px,2vw,14px);white-space:nowrap;}
+.theme-toggle{width:38px;height:38px;border-radius:50%;background:var(--ink-2);border:1px solid rgba(200,155,60,0.3);color:var(--gold);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex:none;transition:transform .3s ease,background .3s ease;}
+.theme-toggle:hover{transform:rotate(20deg);background:var(--gold);color:var(--ink);}
+
+.b-hero{position:relative;overflow:hidden;padding:clamp(50px,8vw,84px) 0 clamp(56px,9vw,90px);background:radial-gradient(circle at 80% 20%,#1c2650 0%,var(--ink) 55%),var(--ink);background-size:140% 140%;animation:heroShift 16s ease-in-out infinite;text-align:center;color:var(--text-light);}
+@keyframes heroShift{0%,100%{background-position:0% 0%;}50%{background-position:60% 40%;}}
+.b-hero::before{content:"";position:absolute;inset:0;opacity:.08;pointer-events:none;background-image:repeating-linear-gradient(45deg,var(--gold) 0,var(--gold) 1px,transparent 1px,transparent 60px),repeating-linear-gradient(-45deg,var(--gold) 0,var(--gold) 1px,transparent 1px,transparent 60px);}
+.b-letters{position:absolute;inset:0;pointer-events:none;}
+.b-letters span{position:absolute;font-family:'Amiri',serif;color:var(--gold);opacity:0;animation:floatUp linear infinite;}
+@keyframes floatUp{0%{opacity:0;transform:translateY(0) rotate(0deg);}10%{opacity:.3;}85%{opacity:.15;}100%{opacity:0;transform:translateY(-420px) rotate(20deg);}}
+.b-hero-inner{position:relative;z-index:2;}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:13px;letter-spacing:1px;color:var(--gold);font-weight:700;margin-bottom:16px;}
+.eyebrow::before,.eyebrow::after{content:"";width:26px;height:2px;background:var(--gold);}
+.b-hero h1{font-size:clamp(28px,5.4vw,50px);}
+.b-hero p{color:#C9C2AA;font-size:clamp(14px,2vw,16px);margin-top:14px;max-width:520px;margin-inline:auto;}
+
+.b-body{padding:clamp(36px,6vw,60px) 0 clamp(70px,10vw,110px);}
+.tabs-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:44px;}
+.blog-tab{padding:10px 22px;border-radius:100px;background:var(--card-bg-2);color:var(--text-primary);font-weight:700;font-size:14px;border:none;font-family:'Cairo',sans-serif;cursor:pointer;transition:.3s;}
+.blog-tab.active{background:var(--ink);color:var(--gold);}
+
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.blog-card{background:var(--card-bg);border:1px solid var(--border-soft);border-radius:18px;padding:24px;display:none;flex-direction:column;gap:12px;transition:transform .3s ease,box-shadow .3s ease;box-shadow:0 8px 24px rgba(36,30,19,0.05);}
+.blog-card.show{display:flex;}
+.blog-card:hover{transform:translateY(-8px);box-shadow:0 20px 40px rgba(36,30,19,0.12);}
+.bc-top{display:flex;align-items:center;justify-content:space-between;}
+.bc-tag{font-size:11px;font-weight:700;color:var(--gold);background:var(--card-bg-2);padding:5px 12px;border-radius:100px;}
+.bc-read{font-size:12px;color:var(--text-muted-2);}
+.blog-card h3{font-family:'Amiri',serif;font-size:17px;color:var(--text-primary);line-height:1.6;}
+.blog-card p{font-size:13.5px;color:var(--text-muted);line-height:1.8;flex:1;}
+.bc-more{font-size:13px;color:var(--maroon);font-weight:700;}
+html[data-theme="dark"] .bc-more{color:var(--gold-light);}
+
+footer{background:var(--footer-bg);color:var(--footer-text);text-align:center;padding:26px 0 calc(26px + env(safe-area-inset-bottom,0px));font-size:13px;}
+footer a{color:var(--gold);}
+footer .addr{font-size:12px;margin-bottom:8px;opacity:.85;}
+
+@media(max-width:900px){.blog-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.blog-grid{grid-template-columns:1fr;}.tabs-row{gap:8px;}.blog-tab{padding:9px 16px;font-size:13px;}}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="container">
+    <a href="index.html" class="logo">أ<span>.</span> محمد السبكي</a>
+    <div class="top-actions">
+      <a href="index.html" class="back-link">→ الرجوع للموقع</a>
+      <button class="theme-toggle" id="themeToggle" title="تبديل الوضع الليلي/النهاري">🌙</button>
+    </div>
+  </div>
+</div>
+
+<section class="b-hero">
+  <div class="b-letters" id="bLetters"></div>
+  <div class="container b-hero-inner">
+    <div class="eyebrow">مدونة اللغة العربية</div>
+    <h1>مقالات تفهّمك اللغة العربية صح</h1>
+    <p>نحو، بلاغة، أدب، إملاء، تعبير، وخطط مذاكرة عملية — كل حاجة محتاجها تفهم اللغة العربية من غير حفظ.</p>
+  </div>
+</section>
+
+<div class="b-body">
+  <div class="container">
+    <div class="tabs-row" id="tabsRow">
+      <button class="blog-tab active" data-cat="الكل">الكل</button>
+<button class="blog-tab" data-cat="نحو">نحو</button>
+<button class="blog-tab" data-cat="بلاغة">بلاغة</button>
+<button class="blog-tab" data-cat="أدب">أدب</button>
+<button class="blog-tab" data-cat="إملاء">إملاء</button>
+<button class="blog-tab" data-cat="تعبير">تعبير</button>
+<button class="blog-tab" data-cat="مذاكرة">مذاكرة</button>
+    </div>
+    <div class="blog-grid" id="blogGrid">
+      <a class="blog-card reveal" data-cat="نحو" href="blog/asrar-alnahw.html">
+  <div class="bc-top"><span class="bc-tag">نحو</span><span class="bc-read">📖 5 دقايق</span></div>
+  <h3>أنا وياك: ليه بنغلط في النحو رغم إننا بنتكلم عربي؟</h3>
+  <p>النحو مش لغة تانية غريبة عننا، هو بس قواعد اللغة اللي بنتكلمها كل يوم من غير ما نحس. خليك معايا تكتشف ليه بنغلط ونحلها مع بعض.</p>
+  <span class="bc-more">اقرأ المقالة ←</span>
+</a>
+<a class="blog-card reveal" data-cat="نحو" href="blog/naeb-alfail.html">
+  <div class="bc-top"><span class="bc-tag">نحو</span><span class="bc-read">📖 4 دقايق</span></div>
+  <h3>سر الفرق بين الفاعل ونائب الفاعل في 3 دقايق</h3>
+  <p>واحدة من أكتر نقط النحو اللي بتلخبط الطلاب، وهنا هتفهمها بطريقة مبسطة تخليك متلخبطش تاني.</p>
+  <span class="bc-more">اقرأ المقالة ←</span>
+</a>
+<a class="blog-card reveal" data-cat="بلاغة" href="blog/balagha-mesh-riyadiyat.html">
+  <div class="bc-top"><span class="bc-tag">بلاغة</span><span class="bc-read">📖 6 دقايق</span></div>
+  <h3>البلاغة مش رياضيات: إزاي تحس بالصورة الجمالية في أي نص؟</h3>
+  <p>البلاغة مش معادلة تتحفظ، هي إحساس بيتعلم. هنا هتلاقي طريقة عملية تخليك تكتشف الصورة الجمالية في أي نص جديد.</p>
+  <span class="bc-more">اقرأ المقالة ←</span>
+</a>
+<a class="blog-card reveal" data-cat="بلاغة" href="blog/tashbih-wa-istiara.html">
+  <div class="bc-top"><span class="bc-tag">بلاغة</span><span class="bc-read">📖 5 دقايق</span></div>
+  <h3>الاستعارة والتشبيه.. إيه الفرق اللي هيفرق معاك في الامتحان؟</h3>
+  <p>من أكتر الأسئلة اللي بتتكرر: إيه الفرق بين التشبيه والاستعارة؟ هنا هتفهمها فرق هتفتكره طول عمرك.</p>
+  <span class="bc-more">اقرأ المقالة ←</span>
+</a>
+<a class="blog-card reveal" data-cat="إملاء" href="blog/akhtaa-imlaiyya.html">
+  <div class="bc-top"><span class="bc-tag">إملاء</span><span class="bc-read">📖 4 دقايق</span></div>
+  <h3>5 أخطاء إملائية بيقع فيها 90% من الطلاب (وإزاي تتجنبها)</h3>
+  <p>أخطاء إملائية بسيطة ممكن تكلفك درجات في أي مادة مش بس العربي. اعرفها وابعد عنها للأبد.</p>
+  <span class="bc-more">اقرأ المقالة ←</span>
+</a>
+<a class="blog-card reveal" data-cat="إملاء" href="blog/hamzat-alwasl-alqate.html">
+  <div class="bc-top"><span class="bc-tag">إملاء</span><span class="bc-read">📖 5 دقايق</span></div>
+  <h3>همزة الوصل والقطع: القاعدة اللي هتخلصك من الغلط للأبد</h3>
+  <p>من أكتر حاجات الإملاء اللي بتفرق في تقييم الكتابة. هنا طريقة سهلة تفرق بيها في ثانية.</p>
+  <span class="bc-more">اقرأ المقالة ←</span>
+</a>
+<a class="blog-card reveal" data-cat="تعبير" href="blog/muqaddimat-tabir.html">
+  <div class="bc-top"><span class="bc-tag">تعبير</span><span class="bc-read">📖 6 دقايق</span></div>
+  <h3>إزاي تكتب مقدمة موضوع تعبير تخطف نظر المصحح من أول سطر؟</h3>
+  <p>أول سطرين في موضوع التعبير بيحددوا انطباع المصحح عن الموضوع كله. اتعلم إزاي تكتبهم صح.</p>
+  <span class="bc-more">اقرأ المقالة ←</span>
+</a>
+<a class="blog-card reveal" data-cat="مذاكرة" href="blog/khutat-muzakara.html">
+  <div class="bc-top"><span class="bc-tag">مذاكرة</span><span class="bc-read">📖 7 دقايق</span></div>
+  <h3>خطة مذاكرة اللغة العربية للثانوية العامة في آخر شهرين</h3>
+  <p>لو الوقت قرب والمنهج لسه كبير، دي خطة عملية تنظملك آخر شهرين قبل امتحان اللغة العربية.</p>
+  <span class="bc-more">اقرأ المقالة ←</span>
+</a>
+<a class="blog-card reveal" data-cat="أدب" href="blog/asr-aldaef.html">
+  <div class="bc-top"><span class="bc-tag">أدب</span><span class="bc-read">📖 6 دقايق</span></div>
+  <h3>عصر الضعف الأدبي: ليه الدرس ده بيرعب الطلاب وإزاي تفهمه بسهولة؟</h3>
+  <p>من أكتر دروس الأدب اللي بترعب الطلاب بسبب كثرة الأسماء والتواريخ. هنا هتفهمه بطريقة مختلفة تمامًا.</p>
+  <span class="bc-more">اقرأ المقالة ←</span>
+</a>
+<a class="blog-card reveal" data-cat="نحو" href="blog/mamnou-min-alsarf.html">
+  <div class="bc-top"><span class="bc-tag">نحو</span><span class="bc-read">📖 5 دقايق</span></div>
+  <h3>الممنوع من الصرف: القاعدة اللي هتحل عليك 90% من أسئلة النحو</h3>
+  <p>باب بسيط لو فهمته صح هيوفرلك وقت كبير في الامتحان. خليك معايا نبسطه سوا.</p>
+  <span class="bc-more">اقرأ المقالة ←</span>
+</a>
+<a class="blog-card reveal" data-cat="أدب" href="blog/tahlil-nas-jaded.html">
+  <div class="bc-top"><span class="bc-tag">أدب</span><span class="bc-read">📖 6 دقايق</span></div>
+  <h3>إزاي تحلل نص أدبي جديد لأول مرة تشوفه في الامتحان؟</h3>
+  <p>أكتر خوف عند الطلاب إنه يواجه نص مش متعود عليه في الامتحان. دي خطوات عملية تقدر تطبقها على أي نص جديد.</p>
+  <span class="bc-more">اقرأ المقالة ←</span>
+</a>
+<a class="blog-card reveal" data-cat="نحو" href="blog/alhal-waltamyiz.html">
+  <div class="bc-top"><span class="bc-tag">نحو</span><span class="bc-read">📖 5 دقايق</span></div>
+  <h3>الفرق بين الحال والتمييز: أشهر لغبطة في النحو وحلها بالتفصيل</h3>
+  <p>من أكتر نقط النحو اللي بتتلخبط مع بعض. هنا الفرق هيتوضحلك بمثال بسيط تفتكره بيه.</p>
+  <span class="bc-more">اقرأ المقالة ←</span>
+</a>
+<a class="blog-card reveal" data-cat="إملاء" href="blog/hamza-mutawassita.html">
+  <div class="bc-top"><span class="bc-tag">إملاء</span><span class="bc-read">📖 5 دقايق</span></div>
+  <h3>10 دقايق تراجع فيها كل قواعد الهمزة المتوسطة والمتطرفة</h3>
+  <p>مراجعة سريعة ومركزة لقواعد الهمزة اللي بتتكرر في كل امتحان تقريبًا.</p>
+  <span class="bc-more">اقرأ المقالة ←</span>
+</a>
+<a class="blog-card reveal" data-cat="مذاكرة" href="blog/qalaq-alimtihan.html">
+  <div class="bc-top"><span class="bc-tag">مذاكرة</span><span class="bc-read">📖 5 دقايق</span></div>
+  <h3>قلق الامتحان: إزاي تتعامل مع رهبة امتحان اللغة العربية؟</h3>
+  <p>مش بس المذاكرة هي اللي بتفرق في النتيجة، طريقة تعاملك مع القلق يوم الامتحان مهمة بنفس القدر.</p>
+  <span class="bc-more">اقرأ المقالة ←</span>
+</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="addr">📍 محافظة البحيرة – دمنهور، آخر شارع شركة WE، بجوار منطقة الفجالة</div>
+  © 2026 أ. محمد السبكي — <a href="index.html">الرجوع للصفحة الرئيسية</a> · <a href="privacy.html">سياسة الخصوصية</a>
+</footer>
+
+<script>
+const themeToggle=document.getElementById('themeToggle');
+function applyThemeIcon(){const isDark=document.documentElement.getAttribute('data-theme')==='dark';themeToggle.textContent=isDark?'☀️':'🌙';}
+applyThemeIcon();
+themeToggle.addEventListener('click',()=>{
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  if(isDark){document.documentElement.removeAttribute('data-theme');localStorage.setItem('theme','light');}
+  else{document.documentElement.setAttribute('data-theme','dark');localStorage.setItem('theme','dark');}
+  applyThemeIcon();
+});
+
+const arabicLetters=['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س'];
+const bLettersLayer=document.getElementById('bLetters');
+for(let i=0;i<16;i++){
+  const s=document.createElement('span');
+  s.textContent=arabicLetters[Math.floor(Math.random()*arabicLetters.length)];
+  s.style.right=Math.random()*100+'%';
+  s.style.bottom='-30px';
+  s.style.fontSize=(14+Math.random()*18)+'px';
+  s.style.animationDuration=(9+Math.random()*10)+'s';
+  s.style.animationDelay=(Math.random()*10)+'s';
+  bLettersLayer.appendChild(s);
+}
+
+const tabs=document.querySelectorAll('.blog-tab');
+const cards=document.querySelectorAll('.blog-card');
+function filterCards(cat){
+  cards.forEach(c=>{c.classList.toggle('show', cat==='الكل' || c.dataset.cat===cat);});
+}
+tabs.forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    tabs.forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    filterCards(tab.dataset.cat);
+  });
+});
+filterCards('الكل');
+
+const revealEls=document.querySelectorAll('.reveal');
+const io=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in-view');io.unobserve(e.target);}});
+},{threshold:0.1});
+revealEls.forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
