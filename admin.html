@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>لوحة التحكم | أ. محمد السبكي</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,700;1,400&family=Cairo:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#11172A;--ink-2:#1B2440;--gold:#C89B3C;--gold-light:#E7C878;
+  --text-light:#F3ECD9;--danger:#D9534F;--success:#4CAF7D;--muted:#B8B097;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif;background:var(--ink);color:var(--text-light);min-height:100vh;}
+.wrap{max-width:960px;margin:0 auto;padding:24px 18px calc(24px + env(safe-area-inset-bottom,0px));}
+h1{font-family:'Amiri',serif;font-size:22px;margin-bottom:4px;}
+.sub{color:var(--muted);font-size:13px;margin-bottom:26px;}
+
+.gate-card{max-width:360px;margin:80px auto;background:var(--ink-2);border-radius:18px;padding:32px;text-align:center;}
+.gate-card .icon{font-size:36px;margin-bottom:12px;}
+.gate-card input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(243,236,217,0.15);background:var(--ink);color:var(--text-light);margin:16px 0;font-family:'Cairo',sans-serif;}
+.gate-card button{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--gold-light),var(--gold));color:var(--ink);font-weight:700;cursor:pointer;}
+.gate-msg{color:var(--danger);font-size:13px;min-height:18px;margin-top:8px;}
+
+.dash{display:none;}
+.dash.active{display:block;}
+.search-row{display:flex;gap:10px;margin-bottom:18px;}
+.search-row input{flex:1;padding:12px 16px;border-radius:100px;border:1px solid rgba(243,236,217,0.15);background:var(--ink-2);color:var(--text-light);font-family:'Cairo',sans-serif;}
+.stats{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+.stat{background:var(--ink-2);border-radius:12px;padding:12px 18px;font-size:13px;color:var(--muted);}
+.stat b{color:var(--gold-light);font-size:16px;display:block;}
+
+.user-row{
+  display:flex;align-items:center;gap:12px;background:var(--ink-2);border-radius:14px;padding:12px 16px;margin-bottom:10px;
+}
+.user-row img{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;background:var(--ink);}
+.user-info{flex:1;min-width:0;}
+.user-info .name{font-weight:700;font-size:14.5px;display:flex;align-items:center;gap:6px;}
+.user-info .name .badge{color:var(--gold);font-size:13px;}
+.user-info .email{font-size:12px;color:var(--muted);}
+.tag{font-size:11px;padding:3px 9px;border-radius:100px;flex:none;}
+.tag.banned{background:rgba(217,83,79,0.15);color:var(--danger);}
+.actions{display:flex;gap:6px;flex:none;}
+.actions button{
+  font-size:12px;padding:8px 12px;border-radius:100px;border:1px solid rgba(243,236,217,0.15);
+  background:var(--ink);color:var(--text-light);cursor:pointer;white-space:nowrap;
+}
+.actions button.on{background:var(--gold);color:var(--ink);border-color:var(--gold);}
+.actions button.danger-on{background:var(--danger);color:#fff;border-color:var(--danger);}
+.empty{text-align:center;color:var(--muted);padding:40px 0;font-size:14px;}
+
+@media(max-width:560px){
+  .user-row{flex-wrap:wrap;}
+  .actions{width:100%;justify-content:flex-end;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="gate-card" id="gateCard">
+    <div class="icon">🔐</div>
+    <h1 style="font-size:18px;">دخول لوحة التحكم</h1>
+    <p class="sub" style="margin-bottom:0;">لازم تكون مسجل دخول بحسابك الأساسي الأول من login.html</p>
+    <input type="password" id="adminPassword" placeholder="كلمة مرور الأدمن">
+    <button id="adminEnterBtn">دخول</button>
+    <div class="gate-msg" id="gateMsg"></div>
+  </div>
+
+  <div class="dash" id="dash">
+    <h1>لوحة تحكم الطلاب</h1>
+    <div class="sub">حظر / فك حظر / توثيق أي طالب</div>
+
+    <div class="stats" id="stats"></div>
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="دور باسم أو إيميل الطالب...">
+    </div>
+    <div id="usersList"><div class="empty">جاري التحميل...</div></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, updateDoc, collection, getDocs, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDxpnYFbxF7Vtx_Y0v5cCbZddsUbs1Q2co",
+  authDomain: "mohamed-el-sobky-be252.firebaseapp.com",
+  projectId: "mohamed-el-sobky-be252",
+  storageBucket: "mohamed-el-sobky-be252.firebasestorage.app",
+  messagingSenderId: "1076421037716",
+  appId: "1:1076421037716:web:4145cd3c5a6787ba0fee81",
+  measurementId: "G-2W4LHCPTL1"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ---- password gate (extra UX layer; real protection is the Firestore "admins" allowlist below) ----
+// SHA-256 hash of the admin password. Default password: "admin123" — CHANGE THIS.
+// To generate a new hash for a new password, run in any browser console:
+// crypto.subtle.digest('SHA-256', new TextEncoder().encode('yourpassword')).then(b=>console.log(Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')))
+const PASSWORD_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"; // sha256("admin123")
+
+async function sha256(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+const gateCard = document.getElementById('gateCard');
+const gateMsg = document.getElementById('gateMsg');
+const dash = document.getElementById('dash');
+let isAdminUser = false;
+let unlockedByPassword = false;
+
+document.getElementById('adminEnterBtn').addEventListener('click', async ()=>{
+  const pass = document.getElementById('adminPassword').value;
+  const hash = await sha256(pass);
+  if(hash !== PASSWORD_HASH){
+    gateMsg.textContent = 'كلمة المرور غلط.';
+    return;
+  }
+  unlockedByPassword = true;
+  tryEnterDash();
+});
+
+function tryEnterDash(){
+  if(!unlockedByPassword){ return; }
+  if(!isAdminUser){
+    gateMsg.textContent = 'الحساب المسجل دخول بيه دلوقتي مش أدمن. سجل دخول بحساب الأدمن من login.html الأول.';
+    return;
+  }
+  gateCard.style.display = 'none';
+  dash.classList.add('active');
+  loadUsers();
+}
+
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){ isAdminUser = false; return; }
+  const snap = await getDoc(doc(db, 'admins', user.uid));
+  isAdminUser = snap.exists();
+});
+
+// ---- users list ----
+const usersListEl = document.getElementById('usersList');
+const statsEl = document.getElementById('stats');
+const searchInput = document.getElementById('searchInput');
+let allUsers = [];
+
+function renderUsers(){
+  const term = searchInput.value.trim().toLowerCase();
+  const filtered = allUsers.filter(u =>
+    !term || (u.name||'').toLowerCase().includes(term) || (u.email||'').toLowerCase().includes(term)
+  );
+
+  const bannedCount = allUsers.filter(u=>u.banned).length;
+  const verifiedCount = allUsers.filter(u=>u.verified).length;
+  statsEl.innerHTML =
+    '<div class="stat"><b>'+allUsers.length+'</b>إجمالي الطلاب</div>' +
+    '<div class="stat"><b>'+verifiedCount+'</b>موثقين</div>' +
+    '<div class="stat"><b>'+bannedCount+'</b>محظورين</div>';
+
+  if(filtered.length === 0){
+    usersListEl.innerHTML = '<div class="empty">مفيش نتايج</div>';
+    return;
+  }
+  usersListEl.innerHTML = '';
+  filtered.forEach(u=>{
+    const row = document.createElement('div');
+    row.className = 'user-row';
+    row.innerHTML = `
+      <img src="${u.photoURL || ''}" alt="">
+      <div class="user-info">
+        <div class="name">${u.name || 'بدون اسم'} ${u.verified ? '<span class="badge">✔</span>' : ''} ${u.banned ? '<span class="tag banned">محظور</span>' : ''}</div>
+        <div class="email">${u.email || ''}</div>
+      </div>
+      <div class="actions">
+        <button class="verify-btn ${u.verified?'on':''}">${u.verified ? 'إلغاء التوثيق' : 'توثيق'}</button>
+        <button class="ban-btn ${u.banned?'danger-on':''}">${u.banned ? 'فك الحظر' : 'حظر'}</button>
+      </div>
+    `;
+    row.querySelector('.verify-btn').addEventListener('click', async ()=>{
+      await updateDoc(doc(db,'users',u.id), { verified: !u.verified });
+    });
+    row.querySelector('.ban-btn').addEventListener('click', async ()=>{
+      await updateDoc(doc(db,'users',u.id), { banned: !u.banned });
+    });
+    usersListEl.appendChild(row);
+  });
+}
+
+function loadUsers(){
+  onSnapshot(collection(db,'users'), (snap)=>{
+    allUsers = [];
+    snap.forEach(d=> allUsers.push({ id: d.id, ...d.data() }));
+    renderUsers();
+  });
+}
+
+searchInput.addEventListener('input', renderUsers);
+</script>
+</body>
+</html>
