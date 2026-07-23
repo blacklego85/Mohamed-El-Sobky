@@ -89,9 +89,19 @@ footer .addr{font-size:12px;margin-bottom:8px;opacity:.85;}
 
 @media(max-width:900px){.blog-grid{grid-template-columns:1fr 1fr;}}
 @media(max-width:600px){.blog-grid{grid-template-columns:1fr;}.tabs-row{gap:8px;}.blog-tab{padding:9px 16px;font-size:13px;}}
+
+.ambient-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;}
+.ambient-bg span{position:absolute;font-family:'Amiri',serif;color:var(--gold);opacity:.05;will-change:transform;animation:ambientDrift linear infinite;}
+html[data-theme="dark"] .ambient-bg span{opacity:.08;}
+@keyframes ambientDrift{
+  0%{transform:translate(0,0) rotate(0deg);}
+  50%{transform:translate(-26px,-36px) rotate(10deg);}
+  100%{transform:translate(0,0) rotate(0deg);}
+}
 </style>
 </head>
 <body>
+<div class="ambient-bg" id="ambientBgOuter"></div>
 
 <div class="top-bar">
   <div class="container">
@@ -218,6 +228,20 @@ footer .addr{font-size:12px;margin-bottom:8px;opacity:.85;}
 </footer>
 
 <script>
+const ambientLetters=['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','س','ع','ف','ق','ل','م','ن','ه'];
+const ambientLayerOuter=document.getElementById('ambientBgOuter');
+const ambientPositions=[[6,10],[88,8],[18,32],[70,28],[40,48],[92,55],[10,68],[60,72],[30,86],[80,92],[50,15],[3,90]];
+ambientPositions.forEach((pos)=>{
+  const s=document.createElement('span');
+  s.textContent=ambientLetters[Math.floor(Math.random()*ambientLetters.length)];
+  s.style.left=pos[0]+'%';
+  s.style.top=pos[1]+'%';
+  s.style.fontSize=(60+Math.random()*90)+'px';
+  s.style.animationDuration=(14+Math.random()*14)+'s';
+  s.style.animationDelay=(Math.random()*8)+'s';
+  ambientLayerOuter.appendChild(s);
+});
+
 const themeToggle=document.getElementById('themeToggle');
 function applyThemeIcon(){const isDark=document.documentElement.getAttribute('data-theme')==='dark';themeToggle.textContent=isDark?'☀️':'🌙';}
 applyThemeIcon();
