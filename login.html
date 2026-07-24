@@ -259,7 +259,7 @@ html[data-theme="dark"] .theme-toggle .icon-moon{display:block;}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  getAuth, GoogleAuthProvider, signInWithPopup,
+  getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
   createUserWithEmailAndPassword, signInWithEmailAndPassword,
   sendEmailVerification, sendPasswordResetEmail,
   onAuthStateChanged, signOut, updateProfile, reload
@@ -396,17 +396,40 @@ document.getElementById('loginPanel').addEventListener('submit', async (e)=>{
 });
 
 // ---- Google Sign-in (both buttons) ----
+function isMobileDevice(){
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+}
 async function googleSignIn(){
   clearMsg();
   try{
+    if(isMobileDevice()){
+      // popups are unreliable on mobile browsers; use a full-page redirect instead
+      await signInWithRedirect(auth, googleProvider);
+      return;
+    }
     const result = await signInWithPopup(auth, googleProvider);
     checkProfileThenGo(result.user);
   }catch(err){
+    if(err && (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request')){
+      try{ await signInWithRedirect(auth, googleProvider); return; }catch(e2){ /* fall through to error message */ }
+    }
     showMsg(translateError(err.code), 'error');
   }
 }
 document.getElementById('googleBtn').addEventListener('click', googleSignIn);
 document.getElementById('googleBtn2').addEventListener('click', googleSignIn);
+
+// ---- complete sign-in after returning from the Google redirect (mobile flow) ----
+(async function(){
+  try{
+    const result = await getRedirectResult(auth);
+    if(result && result.user){
+      checkProfileThenGo(result.user);
+    }
+  }catch(err){
+    if(err && err.code){ showMsg(translateError(err.code), 'error'); }
+  }
+})();
 
 // ---- Forgot password ----
 document.getElementById('forgotBtn').addEventListener('click', async ()=>{

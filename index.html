@@ -98,6 +98,36 @@ html[data-theme="dark"]{
   color-scheme:dark;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
+
+.site-loader{
+  position:fixed;inset:0;z-index:9999;background:var(--ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  transition:opacity .5s ease, visibility .5s ease;
+}
+.site-loader.hide{opacity:0;visibility:hidden;pointer-events:none;}
+.loader-letters{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.loader-letters span{position:absolute;font-family:'Amiri',serif;color:var(--gold);opacity:0;animation:loaderFloat linear infinite;}
+@keyframes loaderFloat{
+  0%{opacity:0;transform:translateY(0) rotate(0deg);}
+  10%{opacity:.3;}90%{opacity:.15;}
+  100%{opacity:0;transform:translateY(-320px) rotate(20deg);}
+}
+.loader-ring{
+  width:86px;height:86px;border-radius:50%;position:relative;
+  border:3px solid rgba(200,155,60,0.22);border-top-color:var(--gold);
+  animation:loaderSpin 1s linear infinite;
+}
+.loader-ring::after{
+  content:"أ";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Amiri',serif;color:var(--gold);font-size:30px;font-weight:700;
+}
+@keyframes loaderSpin{to{transform:rotate(360deg);}}
+.loader-text{color:var(--text-light);font-family:'Cairo',sans-serif;font-size:14px;position:relative;z-index:2;}
+.loader-text .dot{display:inline-block;animation:loaderDot 1.4s infinite;}
+.loader-text .dot:nth-child(2){animation-delay:.2s;}
+.loader-text .dot:nth-child(3){animation-delay:.4s;}
+@keyframes loaderDot{0%,80%,100%{opacity:.2;}40%{opacity:1;}}
+
 html{scroll-behavior:smooth;}
 body{
   font-family:'Cairo',sans-serif;
@@ -649,6 +679,12 @@ body.sticky-active .back-top{bottom:calc(88px + env(safe-area-inset-bottom,0px))
 </style>
 </head>
 <body>
+
+<div class="site-loader" id="siteLoader">
+  <div class="loader-letters" id="loaderLetters"></div>
+  <div class="loader-ring"></div>
+  <div class="loader-text">جاري التحميل<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
+</div>
 <div class="progress-bar" id="progressBar"></div>
 
 <!-- ===== NAV ===== -->
@@ -1252,7 +1288,8 @@ document.getElementById('contactForm').addEventListener('submit',function(e){
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDxpnYFbxF7Vtx_Y0v5cCbZddsUbs1Q2co",
@@ -1264,7 +1301,48 @@ const firebaseConfig = {
   measurementId: "G-2W4LHCPTL1"
 };
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
+
+// ---- loading screen letters ----
+(function(){
+  const letters=['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','س','ع'];
+  const layer=document.getElementById('loaderLetters');
+  const positions=[[10,15],[85,12],[15,80],[80,82],[45,25],[55,70]];
+  positions.forEach(pos=>{
+    const s=document.createElement('span');
+    s.textContent=letters[Math.floor(Math.random()*letters.length)];
+    s.style.right=pos[0]+'%'; s.style.top=pos[1]+'%';
+    s.style.fontSize=(40+Math.random()*50)+'px';
+    s.style.animationDuration=(10+Math.random()*8)+'s';
+    s.style.animationDelay=(Math.random()*5)+'s';
+    layer.appendChild(s);
+  });
+})();
+
+// ---- mandatory login gate ----
+const siteLoader = document.getElementById('siteLoader');
+onAuthStateChanged(auth, async (user)=>{
+  if(!user || (!user.emailVerified && !user.providerData.some(p=>p.providerId==='google.com'))){
+    window.location.replace('login.html?redirect=index.html');
+    return;
+  }
+  try{
+    const snap = await getDoc(doc(db,'users',user.uid));
+    if(!snap.exists() || !snap.data().name || !snap.data().photoURL){
+      window.location.replace('login.html?redirect=index.html');
+      return;
+    }
+    if(snap.data().banned === true){
+      window.location.replace('login.html?redirect=index.html');
+      return;
+    }
+  }catch(e){
+    window.location.replace('login.html?redirect=index.html');
+    return;
+  }
+  siteLoader.classList.add('hide');
+});
 
 const courseGridEl = document.getElementById('courseGrid');
 
