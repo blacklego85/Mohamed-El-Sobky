@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<script>
+(function(){
+  try{
+    var saved = localStorage.getItem('theme');
+    var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if(theme === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); }
+  }catch(e){}
+})();
+</script>
+<title>الأكاديمية | أ. محمد السبكي</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#11172A; --ink-2:#1B2440; --ink-3:#232F55;
+  --parchment:#F7F1E1; --gold:#C89B3C; --gold-light:#E7C878; --maroon:#7C2E2E;
+  --text-light:#F3ECD9; --danger:#D9534F; --success:#4CAF7D;
+  --page-bg-1:#fdf7e8; --page-bg-2:var(--parchment); --card-bg:#ffffff;
+  --input-bg:#F7F1E1; --text-primary:#241E13; --text-muted:#7a715a;
+  --border-soft:#e3d9bc; --divider-bg:rgba(36,30,19,0.12); color-scheme:light;
+}
+html[data-theme="dark"]{
+  --page-bg-1:#1c2650; --page-bg-2:var(--ink); --card-bg:var(--ink-2);
+  --input-bg:var(--ink); --text-primary:var(--text-light); --text-muted:#B8B097;
+  --border-soft:rgba(243,236,217,0.15); --divider-bg:rgba(243,236,217,0.12); color-scheme:dark;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Cairo',sans-serif; min-height:100vh; color:var(--text-primary);
+  background:radial-gradient(circle at 80% 20%,var(--page-bg-1) 0%,var(--page-bg-2) 55%),var(--page-bg-2);
+  padding:max(20px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px));
+  transition:background .35s ease;
+}
+h1,.display{font-family:'Amiri',serif;}
+.topbar{display:flex;align-items:center;justify-content:space-between;max-width:1000px;margin:0 auto 26px;}
+.logo a{font-family:'Amiri',serif;font-size:22px;color:var(--text-primary);text-decoration:none;}
+.logo span{color:var(--gold);}
+.theme-toggle{
+  width:38px;height:38px;border-radius:50%;background:rgba(200,155,60,0.1);
+  border:1.5px solid rgba(200,155,60,0.25);display:flex;align-items:center;justify-content:center;
+  color:var(--gold);cursor:pointer;
+}
+.theme-toggle svg{width:17px;height:17px;display:block;}
+.theme-toggle .icon-moon{display:none;}
+html[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
+html[data-theme="dark"] .theme-toggle .icon-moon{display:block;}
+
+.center-card{
+  max-width:440px;margin:60px auto;background:var(--card-bg);border:1px solid rgba(200,155,60,0.15);
+  border-radius:22px;padding:40px 32px;box-shadow:0 30px 70px rgba(0,0,0,0.2);text-align:center;
+}
+.center-card .icon{font-size:40px;margin-bottom:12px;}
+.center-card h2{font-size:20px;color:var(--gold);margin-bottom:10px;}
+.center-card p{color:var(--text-muted);font-size:14px;line-height:1.9;margin-bottom:20px;}
+.center-card input{
+  width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border-soft);
+  background:var(--input-bg);color:var(--text-primary);font-family:'Cairo',sans-serif;font-size:20px;
+  text-align:center;letter-spacing:4px;outline:none;margin-bottom:14px;
+}
+.btn{width:100%;padding:14px;border-radius:12px;font-weight:700;font-size:15px;border:none;cursor:pointer;font-family:'Cairo',sans-serif;}
+.btn-primary{background:linear-gradient(135deg,var(--gold-light),var(--gold));color:var(--ink);}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed;}
+.wa-btn{display:inline-block;margin-top:14px;color:var(--success);font-weight:700;text-decoration:none;font-size:14px;}
+.err-msg{color:var(--danger);font-size:13px;min-height:18px;margin-top:10px;}
+
+.hide{display:none !important;}
+
+.subjects-wrap{max-width:1000px;margin:0 auto;}
+.page-title{text-align:center;margin-bottom:8px;font-size:26px;}
+.page-sub{text-align:center;color:var(--text-muted);font-size:14px;margin-bottom:34px;}
+.subject-card{
+  background:var(--card-bg);border:1px solid rgba(200,155,60,0.15);border-radius:20px;
+  padding:22px;margin-bottom:20px;box-shadow:0 16px 40px rgba(0,0,0,0.12);
+}
+.subject-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.subject-top h3{font-size:19px;}
+.subject-top .stage-tag{font-size:12px;background:var(--input-bg);color:var(--text-muted);padding:5px 12px;border-radius:100px;}
+.subject-feats{list-style:none;margin:10px 0 16px;padding:0;}
+.subject-feats li{font-size:13.5px;color:var(--text-muted);padding:6px 0;border-bottom:1px dashed var(--divider-bg);}
+.subject-feats li:last-child{border-bottom:none;}
+.price-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.price{font-size:20px;font-weight:900;color:var(--gold);}
+.price small{font-size:12px;font-weight:400;color:var(--text-muted);}
+.open-btn{background:var(--gold);color:var(--ink);border:none;border-radius:100px;padding:10px 22px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;font-size:13.5px;}
+
+.lecture-row{background:var(--card-bg);border:1px solid var(--border-soft);border-radius:14px;padding:14px 18px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.lecture-row .ltitle{font-weight:700;font-size:14px;}
+.lecture-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.lecture-actions a{
+  display:inline-block;padding:9px 16px;border-radius:100px;font-size:12.5px;font-weight:700;text-decoration:none;
+}
+.lecture-actions .watch{background:var(--gold-light);color:var(--ink);}
+.lecture-actions .file{background:var(--ink-3);color:var(--text-light);}
+html[data-theme="dark"] .lecture-actions .file{background:var(--ink);}
+.back-link{display:inline-block;margin-bottom:18px;color:var(--text-muted);text-decoration:none;font-size:13px;}
+
+.ambient-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;}
+.ambient-bg span{position:absolute;font-family:'Amiri',serif;color:var(--gold);opacity:.06;will-change:transform;animation:ambientDrift linear infinite;}
+@keyframes ambientDrift{0%{transform:translate(0,0) rotate(0deg);}50%{transform:translate(-24px,-30px) rotate(9deg);}100%{transform:translate(0,0) rotate(0deg);}}
+</style>
+</head>
+<body>
+<div class="ambient-bg" id="ambientBg"></div>
+
+<div class="topbar">
+  <div class="logo"><a href="index.html">أ<span>.</span> محمد السبكي</a></div>
+  <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع الليلي والفاتح">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+  </button>
+</div>
+
+<!-- loading -->
+<div class="center-card" id="loadingCard"><div class="icon">⏳</div><p>لحظة واحدة...</p></div>
+
+<!-- not subscribed -->
+<div class="center-card hide" id="noSubCard">
+  <div class="icon">🔒</div>
+  <h2>الاشتراك مش مفعّل</h2>
+  <p>حسابك لسه مالوش اشتراك مفعّل في الأكاديمية. تواصل مع المستر عشان يفعّله ويديك كود الدخول الخاص بيك.</p>
+  <a class="wa-btn" href="https://wa.me/201007367432" target="_blank">تواصل على واتساب 💬</a>
+</div>
+
+<!-- device blocked -->
+<div class="center-card hide" id="deviceBlockedCard">
+  <div class="icon">🚫</div>
+  <h2>الاشتراك اتلغى</h2>
+  <p>حسابك متربط بجهاز تاني، فاتلغى الاشتراك تلقائيًا. تواصل مع المستر عشان يفعّله تاني.</p>
+  <a class="wa-btn" href="https://wa.me/201007367432" target="_blank">تواصل على واتساب 💬</a>
+</div>
+
+<!-- code gate -->
+<div class="center-card hide" id="codeCard">
+  <div class="icon">🔑</div>
+  <h2>اكتب كود الدخول</h2>
+  <p>الكود اللي وصلك من المستر عشان تفتح الأكاديمية على الجهاز ده.</p>
+  <input type="text" id="codeInput" inputmode="numeric" placeholder="••••" maxlength="8">
+  <button class="btn btn-primary" id="codeSubmitBtn">دخول</button>
+  <div class="err-msg" id="codeErr"></div>
+</div>
+
+<!-- subjects list -->
+<div class="subjects-wrap hide" id="subjectsView">
+  <h1 class="page-title display">أكاديمية اللغة العربية</h1>
+  <p class="page-sub">كل كورسات أ. محمد السبكي في مكان واحد</p>
+  <div id="subjectsList"></div>
+</div>
+
+<!-- lecture content of one course -->
+<div class="subjects-wrap hide" id="lecturesView">
+  <a href="#" class="back-link" id="backToSubjects">← رجوع لكل الكورسات</a>
+  <h1 class="page-title display" id="courseTitleHeader"></h1>
+  <div id="lecturesList"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, collection, query, orderBy, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDxpnYFbxF7Vtx_Y0v5cCbZddsUbs1Q2co",
+  authDomain: "mohamed-el-sobky-be252.firebaseapp.com",
+  projectId: "mohamed-el-sobky-be252",
+  storageBucket: "mohamed-el-sobky-be252.firebasestorage.app",
+  messagingSenderId: "1076421037716",
+  appId: "1:1076421037716:web:4145cd3c5a6787ba0fee81",
+  measurementId: "G-2W4LHCPTL1"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ambient background letters
+(function(){
+  const letters=['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','س','ع'];
+  const layer=document.getElementById('ambientBg');
+  const positions=[[10,15],[85,12],[15,80],[80,82],[50,8],[50,90]];
+  positions.forEach(pos=>{
+    const s=document.createElement('span');
+    s.textContent=letters[Math.floor(Math.random()*letters.length)];
+    s.style.left=pos[0]+'%'; s.style.top=pos[1]+'%';
+    s.style.fontSize=(45+Math.random()*60)+'px';
+    s.style.animationDuration=(16+Math.random()*12)+'s';
+    s.style.animationDelay=(Math.random()*8)+'s';
+    layer.appendChild(s);
+  });
+})();
+
+// theme toggle
+(function(){
+  const root = document.documentElement;
+  const btn = document.getElementById('themeToggle');
+  btn.addEventListener('click', ()=>{
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    if(isDark){ root.removeAttribute('data-theme'); localStorage.setItem('theme','light'); }
+    else{ root.setAttribute('data-theme','dark'); localStorage.setItem('theme','dark'); }
+  });
+})();
+
+function showOnly(id){
+  ['loadingCard','noSubCard','deviceBlockedCard','codeCard','subjectsView','lecturesView'].forEach(x=>{
+    document.getElementById(x).classList.toggle('hide', x !== id);
+  });
+}
+
+// a per-browser device id, persisted in localStorage
+function getDeviceId(){
+  let id = localStorage.getItem('academy_device_id');
+  if(!id){
+    id = (crypto.randomUUID ? crypto.randomUUID() : (Date.now()+'-'+Math.random().toString(16).slice(2)));
+    localStorage.setItem('academy_device_id', id);
+  }
+  return id;
+}
+
+let currentUser = null;
+let subRef = null;
+let coursesData = [];
+
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){
+    window.location.href = 'login.html?redirect=academy.html';
+    return;
+  }
+  currentUser = user;
+  const profSnap = await getDoc(doc(db,'users',user.uid));
+  if(!profSnap.exists() || !profSnap.data().name || !profSnap.data().photoURL){
+    window.location.href = 'login.html?redirect=academy.html';
+    return;
+  }
+  if(profSnap.data().banned === true){
+    showOnly('noSubCard');
+    return;
+  }
+
+  subRef = doc(db,'subscriptions', user.uid);
+  const subSnap = await getDoc(subRef);
+  if(!subSnap.exists() || subSnap.data().active !== true){
+    showOnly('noSubCard');
+    return;
+  }
+
+  const sub = subSnap.data();
+  const myDeviceId = getDeviceId();
+
+  if(sub.deviceId && sub.deviceId !== myDeviceId){
+    // bound to a different device -> auto-cancel
+    try{ await setDoc(subRef, { active:false }, { merge:true }); }catch(e){}
+    showOnly('deviceBlockedCard');
+    return;
+  }
+
+  // already unlocked on this exact device+browser before?
+  const unlockedKey = 'academy_unlocked_' + user.uid;
+  if(localStorage.getItem(unlockedKey) === '1' && sub.deviceId === myDeviceId){
+    enterAcademy();
+    return;
+  }
+
+  showOnly('codeCard');
+  document.getElementById('codeSubmitBtn').addEventListener('click', async ()=>{
+    const val = document.getElementById('codeInput').value.trim();
+    const errEl = document.getElementById('codeErr');
+    if(!val){ errEl.textContent = 'اكتب الكود الأول.'; return; }
+    if(val !== String(sub.code || '')){
+      errEl.textContent = 'الكود غلط، تأكد منه مع المستر.';
+      return;
+    }
+    errEl.textContent = '';
+    try{
+      if(!sub.deviceId){
+        await setDoc(subRef, { deviceId: myDeviceId }, { merge:true });
+      }
+      localStorage.setItem(unlockedKey, '1');
+      enterAcademy();
+    }catch(e){
+      errEl.textContent = 'حصلت مشكلة، جرب تاني.';
+    }
+  }, { once:true });
+});
+
+function enterAcademy(){
+  showOnly('subjectsView');
+  onSnapshot(query(collection(db,'courses'), orderBy('order','asc')), (snap)=>{
+    coursesData = [];
+    snap.forEach(d=> coursesData.push({ id:d.id, ...d.data() }));
+    renderSubjects();
+  });
+}
+
+function renderSubjects(){
+  const list = document.getElementById('subjectsList');
+  const active = coursesData.filter(c=> c.active !== false);
+  if(active.length === 0){
+    list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:40px 0;">لسه مفيش كورسات مضافة.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  active.forEach(c=>{
+    const card = document.createElement('div');
+    card.className = 'subject-card';
+    const feats = (c.features||[]).map(f=>'<li>'+f+'</li>').join('');
+    card.innerHTML = `
+      <div class="subject-top">
+        <h3 class="display">${c.title}</h3>
+        <span class="stage-tag">${c.stage==='sec' ? 'ثانوي' : 'إعدادي'}</span>
+      </div>
+      <ul class="subject-feats">${feats}</ul>
+      <div class="price-row">
+        <div class="price">${c.price||0}<small> ${c.priceNote||'ج.م / شهر'}</small></div>
+        <button class="open-btn">فتح الكورس</button>
+      </div>
+    `;
+    card.querySelector('.open-btn').addEventListener('click', ()=> openCourse(c));
+    list.appendChild(card);
+  });
+}
+
+function openCourse(course){
+  showOnly('lecturesView');
+  document.getElementById('courseTitleHeader').textContent = course.title;
+  const list = document.getElementById('lecturesList');
+  const lectures = course.lectures || [];
+  if(lectures.length === 0){
+    list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:40px 0;">لسه مفيش محاضرات مضافة لهذا الكورس.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  lectures.forEach(lec=>{
+    const row = document.createElement('div');
+    row.className = 'lecture-row';
+    let actions = '<div class="lecture-actions">';
+    if(lec.videoUrl) actions += `<a class="watch" href="${lec.videoUrl}" target="_blank">▶ مشاهدة الفيديو</a>`;
+    if(lec.fileUrl) actions += `<a class="file" href="${lec.fileUrl}" target="_blank">📄 فتح الملف</a>`;
+    actions += '</div>';
+    row.innerHTML = `<div class="ltitle">${lec.title}</div>${actions}`;
+    list.appendChild(row);
+  });
+}
+
+document.getElementById('backToSubjects').addEventListener('click', (e)=>{
+  e.preventDefault();
+  showOnly('subjectsView');
+});
+</script>
+</body>
+</html>
