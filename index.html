@@ -1322,13 +1322,31 @@ const db = getFirestore(app);
 
 // ---- mandatory login gate ----
 const siteLoader = document.getElementById('siteLoader');
+let authResolved = false;
+
+function withTimeout(promise, ms){
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms))
+  ]);
+}
+
+// hard fallback: لو فايربيز اتأخر أو الشبكة بطيئة أو المتصفح (زي متصفح واتساب/انستجرام
+// الداخلي) بيحجب التخزين، متسبناش شاشة التحميل معلقة للأبد — نحول لصفحة الدخول بعد 8 ثواني
+setTimeout(()=>{
+  if(!authResolved){
+    window.location.replace('login.html?redirect=index.html');
+  }
+}, 8000);
+
 onAuthStateChanged(auth, async (user)=>{
+  authResolved = true;
   if(!user || (!user.emailVerified && !user.providerData.some(p=>p.providerId==='google.com'))){
     window.location.replace('login.html?redirect=index.html');
     return;
   }
   try{
-    const snap = await getDoc(doc(db,'users',user.uid));
+    const snap = await withTimeout(getDoc(doc(db,'users',user.uid)), 6000);
     if(!snap.exists() || !snap.data().name || !snap.data().photoURL){
       window.location.replace('login.html?redirect=index.html');
       return;
