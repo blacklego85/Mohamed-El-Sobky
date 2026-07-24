@@ -81,10 +81,6 @@ html[data-theme="dark"] .art-section h2{color:var(--gold-light);}
 .takeaway-box li{color:var(--text-primary);font-size:14.5px;display:flex;gap:10px;align-items:flex-start;}
 .takeaway-box li::before{content:"✓";color:var(--gold);font-weight:700;flex:none;}
 
-.share-row{display:flex;align-items:center;gap:10px;margin:34px 0;flex-wrap:wrap;}
-.share-label{font-size:13px;color:var(--text-muted-2);font-weight:700;}
-.share-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;transition:transform .25s ease;border:1px solid var(--border-soft);color:var(--text-primary);cursor:pointer;background:var(--card-bg);}
-.share-btn:hover{transform:translateY(-3px);}
 
 .cta-box{background:linear-gradient(160deg,var(--ink-2),var(--ink));border-radius:20px;padding:32px;text-align:center;color:var(--text-light);margin:40px 0;}
 .cta-box h3{font-family:'Amiri',serif;font-size:20px;margin-bottom:10px;}
@@ -115,9 +111,19 @@ footer .addr{font-size:12px;margin-bottom:8px;opacity:.85;}
   .cta-actions{flex-direction:column;}
   .cbtn{justify-content:center;}
 }
+
+.ambient-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;}
+.ambient-bg span{position:absolute;font-family:'Amiri',serif;color:var(--gold);opacity:.05;will-change:transform;animation:ambientDrift linear infinite;}
+html[data-theme="dark"] .ambient-bg span{opacity:.08;}
+@keyframes ambientDrift{
+  0%{transform:translate(0,0) rotate(0deg);}
+  50%{transform:translate(-26px,-36px) rotate(10deg);}
+  100%{transform:translate(0,0) rotate(0deg);}
+}
 </style>
 </head>
 <body>
+<div class="ambient-bg" id="ambientBg"></div>
 
 <div class="top-bar">
   <div class="container">
@@ -154,14 +160,6 @@ footer .addr{font-size:12px;margin-bottom:8px;opacity:.85;}
 <li>ابدأ بالسؤال الأسهل عشان تبني ثقتك</li>
       </ul>
     </div>
-
-    <div class="share-row">
-      <span class="share-label">شارك المقالة:</span>
-      <a class="share-btn" target="_blank" href="https://wa.me/?text=%D9%82%D9%84%D9%82%20%D8%A7%D9%84%D8%A7%D9%85%D8%AA%D8%AD%D8%A7%D9%86%3A%20%D8%A5%D8%B2%D8%A7%D9%8A%20%D8%AA%D8%AA%D8%B9%D8%A7%D9%85%D9%84%20%D9%85%D8%B9%20%D8%B1%D9%87%D8%A8%D8%A9%20%D8%A7%D9%85%D8%AA%D8%AD%D8%A7%D9%86%20%D8%A7%D9%84%D9%84%D8%BA%D8%A9%20%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9%D8%9F%20-%20https%3A//mohamed-el-sobky.vercel.app/blog/qalaq-alimtihan.html">💬</a>
-      <a class="share-btn" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://mohamed-el-sobky.vercel.app/blog/qalaq-alimtihan.html">f</a>
-      <button class="share-btn" id="copyLinkBtn" title="نسخ الرابط">🔗</button>
-    </div>
-
     <div class="cta-box">
       <h3>عايز تفهم الدرس ده بالتفصيل مع تدريبات كتير؟</h3>
       <p>اشترك في كورس مذاكرة مع أ. محمد السبكي، وابدأ تفهم اللغة العربية صح.</p>
@@ -188,6 +186,22 @@ footer .addr{font-size:12px;margin-bottom:8px;opacity:.85;}
 </footer>
 
 <script>
+
+// ambient background letters (whole-page, not just hero)
+const ambientLetters=['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','س','ع','ف','ق','ل','م','ن','ه'];
+const ambientLayer=document.getElementById('ambientBg');
+const ambientPositions=[[6,10],[88,8],[18,32],[70,28],[40,48],[92,55],[10,68],[60,72],[30,86],[80,92],[50,15],[3,90]];
+ambientPositions.forEach((pos,i)=>{
+  const s=document.createElement('span');
+  s.textContent=ambientLetters[Math.floor(Math.random()*ambientLetters.length)];
+  s.style.left=pos[0]+'%';
+  s.style.top=pos[1]+'%';
+  s.style.fontSize=(60+Math.random()*90)+'px';
+  s.style.animationDuration=(14+Math.random()*14)+'s';
+  s.style.animationDelay=(Math.random()*8)+'s';
+  ambientLayer.appendChild(s);
+});
+
 const themeToggle=document.getElementById('themeToggle');
 function applyThemeIcon(){const isDark=document.documentElement.getAttribute('data-theme')==='dark';themeToggle.textContent=isDark?'☀️':'🌙';}
 applyThemeIcon();
@@ -211,14 +225,6 @@ for(let i=0;i<10;i++){
   pLettersLayer.appendChild(s);
 }
 
-document.getElementById('copyLinkBtn').addEventListener('click', async ()=>{
-  try{
-    await navigator.clipboard.writeText(window.location.href);
-    const btn=document.getElementById('copyLinkBtn');
-    const old=btn.textContent; btn.textContent='✓';
-    setTimeout(()=>btn.textContent=old,1500);
-  }catch(e){}
-});
 </script>
 </body>
 </html>
