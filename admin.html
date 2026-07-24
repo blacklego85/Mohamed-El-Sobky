@@ -52,13 +52,57 @@ h1{font-family:'Amiri',serif;font-size:22px;margin-bottom:4px;}
 .actions button.danger-on{background:var(--danger);color:#fff;border-color:var(--danger);}
 .empty{text-align:center;color:var(--muted);padding:40px 0;font-size:14px;}
 
+.tabs-bar{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;}
+.tab-btn{padding:10px 20px;border-radius:100px;border:1px solid rgba(243,236,217,0.15);background:var(--ink-2);color:var(--text-light);font-size:13.5px;font-weight:700;cursor:pointer;position:relative;}
+.tab-btn.active{background:var(--gold);color:var(--ink);border-color:var(--gold);}
+.tab-btn .count-dot{position:absolute;top:-4px;left:-4px;background:var(--danger);color:#fff;font-size:10px;min-width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;padding:0 3px;}
+.tab-btn .count-dot.show{display:flex;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+.course-form{background:var(--ink-2);border-radius:16px;padding:18px;margin-bottom:22px;display:grid;gap:10px;}
+.course-form .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.course-form input,.course-form select,.course-form textarea{
+  padding:11px 14px;border-radius:10px;border:1px solid rgba(243,236,217,0.15);background:var(--ink);color:var(--text-light);
+  font-family:'Cairo',sans-serif;font-size:13.5px;width:100%;
+}
+.course-form textarea{min-height:80px;resize:vertical;}
+.course-form label{font-size:12px;color:var(--muted);margin-bottom:2px;display:block;}
+.course-form .save-btn{background:linear-gradient(135deg,var(--gold-light),var(--gold));color:var(--ink);border:none;border-radius:10px;padding:12px;font-weight:700;cursor:pointer;}
+.course-form .cancel-btn{background:none;border:1px solid rgba(243,236,217,0.15);color:var(--muted);border-radius:10px;padding:10px;cursor:pointer;}
+
+.course-row{background:var(--ink-2);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+.course-row .cinfo{flex:1;min-width:0;}
+.course-row .ctitle{font-weight:700;font-size:14px;}
+.course-row .cmeta{font-size:12px;color:var(--muted);margin-top:3px;}
+.course-row .actions button{background:var(--ink);color:var(--text-light);}
+
+.report-row{background:var(--ink-2);border-radius:14px;padding:14px 16px;margin-bottom:10px;}
+.report-row .rtop{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted);margin-bottom:8px;}
+.report-row .rmsg{background:var(--ink);border-radius:10px;padding:10px 12px;font-size:13.5px;margin-bottom:10px;}
+.report-row .actions{width:100%;}
+
+.badge-icon{vertical-align:-2px;}
+
+.ambient-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;}
+.ambient-bg span{position:absolute;font-family:'Amiri',serif;color:var(--gold);opacity:.06;will-change:transform;animation:ambientDrift linear infinite;}
+@keyframes ambientDrift{
+  0%{transform:translate(0,0) rotate(0deg);}
+  50%{transform:translate(-24px,-32px) rotate(9deg);}
+  100%{transform:translate(0,0) rotate(0deg);}
+}
+
 @media(max-width:560px){
   .user-row{flex-wrap:wrap;}
   .actions{width:100%;justify-content:flex-end;}
+  .course-form .row2{grid-template-columns:1fr;}
+  .course-row{flex-wrap:wrap;}
 }
 </style>
 </head>
 <body>
+<div class="ambient-bg" id="ambientBg"></div>
+
 
 <div class="wrap">
   <div class="gate-card" id="gateCard">
@@ -71,14 +115,51 @@ h1{font-family:'Amiri',serif;font-size:22px;margin-bottom:4px;}
   </div>
 
   <div class="dash" id="dash">
-    <h1>لوحة تحكم الطلاب</h1>
-    <div class="sub">حظر / فك حظر / توثيق أي طالب</div>
+    <h1>لوحة التحكم</h1>
+    <div class="sub">إدارة الطلاب والكورسات والبلاغات</div>
 
-    <div class="stats" id="stats"></div>
-    <div class="search-row">
-      <input type="text" id="searchInput" placeholder="دور باسم أو إيميل الطالب...">
+    <div class="tabs-bar">
+      <button class="tab-btn active" data-panel="students">👤 الطلاب</button>
+      <button class="tab-btn" data-panel="courses">📚 الكورسات</button>
+      <button class="tab-btn" data-panel="reports">🚩 البلاغات<span class="count-dot" id="reportsCountDot">0</span></button>
     </div>
-    <div id="usersList"><div class="empty">جاري التحميل...</div></div>
+
+    <div class="panel active" id="panel-students">
+      <div class="stats" id="stats"></div>
+      <div class="search-row">
+        <input type="text" id="searchInput" placeholder="دور باسم أو إيميل الطالب...">
+      </div>
+      <div id="usersList"><div class="empty">جاري التحميل...</div></div>
+    </div>
+
+    <div class="panel" id="panel-courses">
+      <div class="course-form" id="courseForm">
+        <div class="row2">
+          <div><label>اسم الكورس</label><input type="text" id="cTitle" placeholder="مثال: النحو والصرف الشامل"></div>
+          <div><label>المرحلة</label>
+            <select id="cStage">
+              <option value="prep">إعدادي</option>
+              <option value="sec">ثانوي</option>
+            </select>
+          </div>
+        </div>
+        <div class="row2">
+          <div><label>السعر (رقم بس)</label><input type="number" id="cPrice" placeholder="250"></div>
+          <div><label>ملاحظة السعر</label><input type="text" id="cPriceNote" placeholder="ج.م / شهر"></div>
+        </div>
+        <div><label>مميزات الكورس (سطر لكل ميزة)</label><textarea id="cFeatures" placeholder="شرح كامل لقواعد الصف&#10;تدريبات وامتحانات دورية&#10;مذكرة PDF مرفقة"></textarea></div>
+        <div><label>ترتيب الظهور (رقم، الأقل يظهر الأول)</label><input type="number" id="cOrder" value="0"></div>
+        <div style="display:flex;gap:10px;">
+          <button type="button" class="save-btn" id="courseSaveBtn" style="flex:1;">إضافة الكورس</button>
+          <button type="button" class="cancel-btn" id="courseCancelBtn" style="display:none;">إلغاء التعديل</button>
+        </div>
+      </div>
+      <div id="coursesList"><div class="empty">جاري التحميل...</div></div>
+    </div>
+
+    <div class="panel" id="panel-reports">
+      <div id="reportsList"><div class="empty">جاري التحميل...</div></div>
+    </div>
   </div>
 </div>
 
@@ -86,7 +167,8 @@ h1{font-family:'Amiri',serif;font-size:22px;margin-bottom:4px;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  getFirestore, doc, getDoc, updateDoc, collection, getDocs, onSnapshot
+  getFirestore, doc, getDoc, updateDoc, deleteDoc, addDoc, collection, getDocs, onSnapshot,
+  query, orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -119,6 +201,34 @@ const dash = document.getElementById('dash');
 let isAdminUser = false;
 let unlockedByPassword = false;
 
+const VERIFIED_BADGE = '<svg class="badge-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="#C89B3C" d="M12 1.2l2.1 1.6 2.6-.4 1.1 2.4 2.4 1.1-.4 2.6L21.4 10l-1.6 2.1.4 2.6-2.4 1.1-1.1 2.4-2.6-.4L12 19.8l-2.1-1.6-2.6.4-1.1-2.4-2.4-1.1.4-2.6L2.6 10l1.6-2.1-.4-2.6 2.4-1.1L7.3 1.8l2.6.4L12 1.2z"/><path fill="#fff" d="M9.7 13.1L7.9 11.3l-1.1 1.1 2.9 2.9 6-6-1.1-1.1z"/></svg>';
+
+// ambient background letters
+(function(){
+  const letters=['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','س','ع','ف','ق'];
+  const layer=document.getElementById('ambientBg');
+  const positions=[[8,10],[85,12],[15,50],[75,55],[40,80],[90,88],[5,88]];
+  positions.forEach(pos=>{
+    const s=document.createElement('span');
+    s.textContent=letters[Math.floor(Math.random()*letters.length)];
+    s.style.left=pos[0]+'%'; s.style.top=pos[1]+'%';
+    s.style.fontSize=(55+Math.random()*80)+'px';
+    s.style.animationDuration=(16+Math.random()*14)+'s';
+    s.style.animationDelay=(Math.random()*8)+'s';
+    layer.appendChild(s);
+  });
+})();
+
+// tabs
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+  });
+});
+
 document.getElementById('adminEnterBtn').addEventListener('click', async ()=>{
   const pass = document.getElementById('adminPassword').value;
   const hash = await sha256(pass);
@@ -139,6 +249,8 @@ function tryEnterDash(){
   gateCard.style.display = 'none';
   dash.classList.add('active');
   loadUsers();
+  loadCourses();
+  loadReports();
 }
 
 onAuthStateChanged(auth, async (user)=>{
@@ -177,7 +289,7 @@ function renderUsers(){
     row.innerHTML = `
       <img src="${u.photoURL || ''}" alt="">
       <div class="user-info">
-        <div class="name">${u.name || 'بدون اسم'} ${u.verified ? '<span class="badge">✔</span>' : ''} ${u.banned ? '<span class="tag banned">محظور</span>' : ''}</div>
+        <div class="name">${u.name || 'بدون اسم'} ${u.verified ? VERIFIED_BADGE : ''} ${u.banned ? '<span class="tag banned">محظور</span>' : ''}</div>
         <div class="email">${u.email || ''}</div>
       </div>
       <div class="actions">
@@ -204,6 +316,155 @@ function loadUsers(){
 }
 
 searchInput.addEventListener('input', renderUsers);
+
+// ---- courses management ----
+const coursesListEl = document.getElementById('coursesList');
+const cTitle = document.getElementById('cTitle');
+const cStage = document.getElementById('cStage');
+const cPrice = document.getElementById('cPrice');
+const cPriceNote = document.getElementById('cPriceNote');
+const cFeatures = document.getElementById('cFeatures');
+const cOrder = document.getElementById('cOrder');
+const courseSaveBtn = document.getElementById('courseSaveBtn');
+const courseCancelBtn = document.getElementById('courseCancelBtn');
+let editingCourseId = null;
+let allCourses = [];
+
+function resetCourseForm(){
+  editingCourseId = null;
+  cTitle.value = ''; cPrice.value = ''; cPriceNote.value = 'ج.م / شهر'; cFeatures.value = ''; cOrder.value = '0';
+  cStage.value = 'prep';
+  courseSaveBtn.textContent = 'إضافة الكورس';
+  courseCancelBtn.style.display = 'none';
+}
+resetCourseForm();
+
+courseSaveBtn.addEventListener('click', async ()=>{
+  const title = cTitle.value.trim();
+  if(!title){ alert('اكتب اسم الكورس الأول.'); return; }
+  const payload = {
+    title,
+    stage: cStage.value,
+    price: Number(cPrice.value) || 0,
+    priceNote: cPriceNote.value.trim() || 'ج.م / شهر',
+    features: cFeatures.value.split('\n').map(f=>f.trim()).filter(Boolean),
+    order: Number(cOrder.value) || 0,
+    active: true
+  };
+  try{
+    if(editingCourseId){
+      await updateDoc(doc(db,'courses',editingCourseId), payload);
+    } else {
+      await addDoc(collection(db,'courses'), payload);
+    }
+    resetCourseForm();
+  }catch(e){ alert('حصلت مشكلة، جرب تاني.'); }
+});
+courseCancelBtn.addEventListener('click', resetCourseForm);
+
+function renderCourses(){
+  if(allCourses.length === 0){
+    coursesListEl.innerHTML = '<div class="empty">لسه مفيش كورسات مضافة</div>';
+    return;
+  }
+  coursesListEl.innerHTML = '';
+  allCourses.forEach(c=>{
+    const row = document.createElement('div');
+    row.className = 'course-row';
+    row.innerHTML = `
+      <div class="cinfo">
+        <div class="ctitle">${c.title}</div>
+        <div class="cmeta">${c.stage === 'sec' ? 'ثانوي' : 'إعدادي'} · ${c.price} ${c.priceNote || ''} · ترتيب ${c.order ?? 0}</div>
+      </div>
+      <div class="actions">
+        <button class="edit-course-btn">تعديل</button>
+        <button class="del-course-btn">حذف</button>
+      </div>
+    `;
+    row.querySelector('.edit-course-btn').addEventListener('click', ()=>{
+      editingCourseId = c.id;
+      cTitle.value = c.title || '';
+      cStage.value = c.stage || 'prep';
+      cPrice.value = c.price || '';
+      cPriceNote.value = c.priceNote || '';
+      cFeatures.value = (c.features || []).join('\n');
+      cOrder.value = c.order ?? 0;
+      courseSaveBtn.textContent = 'حفظ التعديل';
+      courseCancelBtn.style.display = 'block';
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+    row.querySelector('.del-course-btn').addEventListener('click', async ()=>{
+      if(!confirm('متأكد إنك عايز تمسح الكورس ده؟')) return;
+      try{ await deleteDoc(doc(db,'courses',c.id)); }catch(e){}
+    });
+    coursesListEl.appendChild(row);
+  });
+}
+
+function loadCourses(){
+  onSnapshot(query(collection(db,'courses'), orderBy('order','asc')), (snap)=>{
+    allCourses = [];
+    snap.forEach(d=> allCourses.push({ id: d.id, ...d.data() }));
+    renderCourses();
+  }, ()=>{
+    // fallback if orderBy index missing / field absent on some docs
+    onSnapshot(collection(db,'courses'), (snap)=>{
+      allCourses = [];
+      snap.forEach(d=> allCourses.push({ id: d.id, ...d.data() }));
+      allCourses.sort((a,b)=>(a.order||0)-(b.order||0));
+      renderCourses();
+    });
+  });
+}
+
+// ---- reports review ----
+const reportsListEl = document.getElementById('reportsList');
+const reportsCountDot = document.getElementById('reportsCountDot');
+
+function renderReports(reports){
+  reportsCountDot.textContent = reports.length;
+  reportsCountDot.classList.toggle('show', reports.length > 0);
+  if(reports.length === 0){
+    reportsListEl.innerHTML = '<div class="empty">مفيش بلاغات جديدة 🎉</div>';
+    return;
+  }
+  reportsListEl.innerHTML = '';
+  reports.forEach(r=>{
+    const row = document.createElement('div');
+    row.className = 'report-row';
+    row.innerHTML = `
+      <div class="rtop"><span>بلاغ من: ${r.reporterName || 'طالب'}</span><span>على رسالة: ${r.messageName || 'طالب'}</span></div>
+      <div class="rmsg">${r.messageText ? r.messageText : (r.messageType === 'image' ? '📷 صورة' : '📎 ملف مرفق')}</div>
+      <div class="actions">
+        <button class="del-msg-btn danger-on">حذف الرسالة</button>
+        <button class="dismiss-btn">تجاهل البلاغ</button>
+      </div>
+    `;
+    row.querySelector('.del-msg-btn').addEventListener('click', async ()=>{
+      try{
+        await deleteDoc(doc(db,'chatRooms', r.roomId, 'messages', r.messageId));
+        await deleteDoc(doc(db,'reports', r.id));
+      }catch(e){ alert('حصلت مشكلة، جرب تاني.'); }
+    });
+    row.querySelector('.dismiss-btn').addEventListener('click', async ()=>{
+      try{ await deleteDoc(doc(db,'reports', r.id)); }catch(e){}
+    });
+    reportsListEl.appendChild(row);
+  });
+}
+
+function loadReports(){
+  onSnapshot(collection(db,'reports'), (snap)=>{
+    const reports = [];
+    snap.forEach(d=> reports.push({ id: d.id, ...d.data() }));
+    reports.sort((a,b)=>{
+      const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+      const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+      return tb - ta;
+    });
+    renderReports(reports);
+  });
+}
 </script>
 </body>
 </html>

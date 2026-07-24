@@ -77,6 +77,32 @@ button{font-family:'Cairo',sans-serif;cursor:pointer;}
 .room-btn:hover{background:var(--card-bg-2);}
 .room-btn.active{background:var(--gold);color:var(--ink);font-weight:700;}
 .room-btn.active .dot{opacity:1;background:var(--ink);}
+.room-btn .unread-dot{width:9px;height:9px;border-radius:50%;background:var(--danger);margin-right:auto;flex:none;display:none;}
+.room-btn.has-unread .unread-dot{display:block;}
+.rooms-mobile button{position:relative;}
+.rooms-mobile button.has-unread::after{content:"";position:absolute;top:5px;left:8px;width:8px;height:8px;border-radius:50%;background:var(--danger);}
+
+.chat-header{position:relative;}
+.chat-header-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.online-count{font-size:12px;color:var(--text-muted-2);display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.online-count .live-dot{width:7px;height:7px;border-radius:50%;background:#3ecf6c;flex:none;animation:livePulse 1.8s ease-in-out infinite;}
+@keyframes livePulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+.bell-btn{
+  width:32px;height:32px;border-radius:50%;background:var(--card-bg-2);border:none;color:var(--text-primary);
+  font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer;
+}
+.bell-btn.on{background:var(--gold);color:var(--ink);}
+
+.pinned-banner{
+  display:none;align-items:flex-start;gap:10px;background:linear-gradient(120deg,var(--ink-2),var(--ink-3));
+  color:var(--text-light);padding:10px 20px;font-size:13px;
+}
+.pinned-banner.show{display:flex;}
+.pinned-banner .pin-icon{font-size:15px;flex:none;margin-top:1px;}
+.pinned-banner .pin-body{flex:1;min-width:0;}
+.pinned-banner .pin-label{color:var(--gold);font-weight:700;font-size:11px;display:block;margin-bottom:2px;}
+.pinned-banner .pin-text{color:#EDE6D6;line-height:1.6;}
+.pinned-banner .pin-close{background:none;border:none;color:#B8B097;font-size:16px;flex:none;cursor:pointer;}
 
 /* mobile rooms as horizontal pills */
 .rooms-mobile{display:none;}
@@ -229,7 +255,23 @@ html[data-theme="dark"] .msg-file-card{background:rgba(255,255,255,0.06);}
 <div class="app">
   <div class="rooms" id="rooms"></div>
   <div class="chat-area">
-    <div class="chat-header"><h2 id="roomTitle">الدردشة العامة</h2></div>
+    <div class="chat-header">
+      <div class="chat-header-top">
+        <h2 id="roomTitle">الدردشة العامة</h2>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="online-count" id="onlineCount"><span class="live-dot"></span><span id="onlineCountText">...</span></span>
+          <button class="bell-btn" id="bellBtn" title="تفعيل تنبيهات الرسائل">🔔</button>
+        </div>
+      </div>
+    </div>
+    <div class="pinned-banner" id="pinnedBanner">
+      <span class="pin-icon">📌</span>
+      <div class="pin-body">
+        <span class="pin-label" id="pinLabel">إعلان مثبّت</span>
+        <div class="pin-text" id="pinText"></div>
+      </div>
+      <button class="pin-close" id="pinClose" title="إلغاء التثبيت">×</button>
+    </div>
     <div class="messages" id="messages"><div class="empty-state">جاري التحميل...</div></div>
     <div class="reply-preview" id="replyPreview">
       <div class="rp-bar"></div>
@@ -265,8 +307,8 @@ html[data-theme="dark"] .msg-file-card{background:rgba(255,255,255,0.06);}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  getFirestore, doc, getDoc, collection, addDoc, deleteDoc, updateDoc,
-  query, orderBy, limit, onSnapshot, serverTimestamp
+  getFirestore, doc, getDoc, getDocs, setDoc, collection, addDoc, deleteDoc, updateDoc,
+  query, where, orderBy, limit, onSnapshot, serverTimestamp, deleteField, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL
@@ -328,6 +370,8 @@ const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" fill="%231B2440"/><circle cx="48" cy="38" r="18" fill="%23C89B3C"/><path d="M14 88c4-20 24-30 34-30s30 10 34 30" fill="%23C89B3C" opacity="0.6"/></svg>'
 );
 
+const VERIFIED_BADGE = '<svg class="v-badge" viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;flex:none;"><path fill="#C89B3C" d="M12 1.2l2.1 1.6 2.6-.4 1.1 2.4 2.4 1.1-.4 2.6L21.4 10l-1.6 2.1.4 2.6-2.4 1.1-1.1 2.4-2.6-.4L12 19.8l-2.1-1.6-2.6.4-1.1-2.4-2.4-1.1.4-2.6L2.6 10l1.6-2.1-.4-2.6 2.4-1.1L7.3 1.8l2.6.4L12 1.2z"/><path fill="#fff" d="M9.7 13.1L7.9 11.3l-1.1 1.1 2.9 2.9 6-6-1.1-1.1z"/></svg>';
+
 const roomsEl = document.getElementById('rooms');
 const roomsMobileEl = document.getElementById('roomsMobile');
 const roomTitleEl = document.getElementById('roomTitle');
@@ -347,28 +391,49 @@ const uploadChipEl = document.getElementById('uploadChip');
 const uploadChipTextEl = document.getElementById('uploadChipText');
 const actionsMenuEl = document.getElementById('actionsMenu');
 const actionsOverlayEl = document.getElementById('actionsOverlay');
+const pinnedBannerEl = document.getElementById('pinnedBanner');
+const pinLabelEl = document.getElementById('pinLabel');
+const pinTextEl = document.getElementById('pinText');
+const pinCloseEl = document.getElementById('pinClose');
+const onlineCountTextEl = document.getElementById('onlineCountText');
+const bellBtnEl = document.getElementById('bellBtn');
 
 let currentUser = null;
 let currentProfile = null;
 let isAdmin = false;
 let currentRoom = 'general';
 let unsubscribe = null;
+let unsubscribeRoomDoc = null;
+let unsubscribeAllRooms = null;
 let replyingTo = null;
 const messagesCache = {};
+const roomsMeta = {}; // roomId -> { lastMessageAt, lastMessageUid }
+let titleFlashTimer = null;
+const ORIGINAL_TITLE = document.title;
+
+function isRoomUnread(roomId){
+  if(roomId === currentRoom) return false;
+  const meta = roomsMeta[roomId];
+  if(!meta || !meta.lastMessageAt) return false;
+  if(meta.lastMessageUid === (currentUser && currentUser.uid)) return false;
+  const lastRead = parseInt(localStorage.getItem('lastRead_' + roomId) || '0', 10);
+  return meta.lastMessageAt > lastRead;
+}
 
 function renderRoomLists(){
   roomsEl.innerHTML = '';
   roomsMobileEl.innerHTML = '';
   ROOMS.forEach(r=>{
+    const unread = isRoomUnread(r.id);
     const btn = document.createElement('button');
-    btn.className = 'room-btn' + (r.id===currentRoom ? ' active' : '');
-    btn.innerHTML = '<span class="dot"></span><span>'+r.name+'</span>';
+    btn.className = 'room-btn' + (r.id===currentRoom ? ' active' : '') + (unread ? ' has-unread' : '');
+    btn.innerHTML = '<span class="dot"></span><span>'+r.name+'</span><span class="unread-dot"></span>';
     btn.addEventListener('click', ()=> switchRoom(r.id));
     roomsEl.appendChild(btn);
 
     const mbtn = document.createElement('button');
     mbtn.textContent = r.name;
-    mbtn.className = r.id===currentRoom ? 'active' : '';
+    mbtn.className = (r.id===currentRoom ? 'active' : '') + (unread ? ' has-unread' : '');
     mbtn.addEventListener('click', ()=> switchRoom(r.id));
     roomsMobileEl.appendChild(mbtn);
   });
@@ -380,8 +445,11 @@ function switchRoom(roomId){
   roomTitleEl.textContent = room ? room.name : '';
   clearReply();
   closeActionsMenu();
+  localStorage.setItem('lastRead_' + roomId, Date.now().toString());
+  stopTitleFlash();
   renderRoomLists();
   listenMessages();
+  listenPinned();
 }
 
 function formatTime(ts){
@@ -488,12 +556,120 @@ fileInputEl.addEventListener('change', async ()=>{
     if(replyingTo){ payload.replyTo = replyingTo; clearReply(); }
 
     await addDoc(collection(db, 'chatRooms', currentRoom, 'messages'), payload);
+    setDoc(doc(db,'chatRooms',currentRoom), {
+      lastMessageAt: serverTimestamp(),
+      lastMessageText: isImage ? '📷 صورة' : '📎 ' + file.name,
+      lastMessageUid: currentUser.uid
+    }, { merge:true }).catch(()=>{});
+    localStorage.setItem('lastRead_' + currentRoom, Date.now().toString());
   }catch(err){
     alert('حصلت مشكلة في رفع الملف، جرب تاني.');
   }finally{
     uploadChipEl.style.display = 'none';
   }
 });
+
+// ---- pinned announcement ----
+function listenPinned(){
+  if(unsubscribeRoomDoc) unsubscribeRoomDoc();
+  pinnedBannerEl.classList.remove('show');
+  unsubscribeRoomDoc = onSnapshot(doc(db, 'chatRooms', currentRoom), (snap)=>{
+    const data = snap.data();
+    if(data && data.pinnedMessage && data.pinnedMessage.text){
+      pinLabelEl.textContent = 'إعلان مثبّت' + (data.pinnedMessage.name ? ' - ' + data.pinnedMessage.name : '');
+      pinTextEl.textContent = data.pinnedMessage.text;
+      pinnedBannerEl.classList.add('show');
+      pinCloseEl.style.display = isAdmin ? 'block' : 'none';
+    } else {
+      pinnedBannerEl.classList.remove('show');
+    }
+  });
+}
+pinCloseEl.addEventListener('click', async ()=>{
+  if(!isAdmin) return;
+  try{ await updateDoc(doc(db,'chatRooms',currentRoom), { pinnedMessage: deleteField() }); }catch(e){}
+});
+
+// ---- unread tracking across all rooms ----
+function listenAllRoomsMeta(){
+  if(unsubscribeAllRooms) unsubscribeAllRooms();
+  let firstLoad = true;
+  unsubscribeAllRooms = onSnapshot(collection(db, 'chatRooms'), (snap)=>{
+    snap.docChanges().forEach(change=>{
+      const roomId = change.doc.id;
+      const data = change.doc.data();
+      const lastMessageAt = data.lastMessageAt && data.lastMessageAt.toMillis ? data.lastMessageAt.toMillis() : 0;
+      const wasNewer = !roomsMeta[roomId] || lastMessageAt > (roomsMeta[roomId].lastMessageAt || 0);
+      roomsMeta[roomId] = { lastMessageAt, lastMessageUid: data.lastMessageUid || null };
+      if(!firstLoad && wasNewer && data.lastMessageUid !== (currentUser && currentUser.uid)){
+        notifyNewMessage(roomId, data.lastMessageText || 'رسالة جديدة');
+      }
+    });
+    firstLoad = false;
+    renderRoomLists();
+  });
+}
+
+function notifyNewMessage(roomId, text){
+  const room = ROOMS.find(r=>r.id===roomId);
+  const roomName = room ? room.name : 'الدردشة';
+  if(roomId !== currentRoom || document.hidden){
+    startTitleFlash();
+  }
+  if(bellBtnEl.classList.contains('on') && document.hidden && window.Notification && Notification.permission === 'granted'){
+    try{
+      new Notification('رسالة جديدة - ' + roomName, { body: text, icon: 'favicon.svg' });
+    }catch(e){}
+  }
+}
+
+function startTitleFlash(){
+  if(titleFlashTimer) return;
+  let on = false;
+  titleFlashTimer = setInterval(()=>{
+    document.title = on ? ORIGINAL_TITLE : '🔴 رسالة جديدة!';
+    on = !on;
+  }, 1200);
+}
+function stopTitleFlash(){
+  if(titleFlashTimer){ clearInterval(titleFlashTimer); titleFlashTimer = null; }
+  document.title = ORIGINAL_TITLE;
+}
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) stopTitleFlash(); });
+
+// ---- notification permission bell ----
+if(window.Notification && Notification.permission === 'granted'){ bellBtnEl.classList.add('on'); }
+bellBtnEl.addEventListener('click', async ()=>{
+  if(!window.Notification){ alert('متصفحك مش بيدعم الإشعارات.'); return; }
+  if(Notification.permission === 'granted'){
+    bellBtnEl.classList.toggle('on');
+    return;
+  }
+  const perm = await Notification.requestPermission();
+  if(perm === 'granted') bellBtnEl.classList.add('on');
+});
+
+// ---- presence heartbeat ----
+function startPresence(){
+  const beat = ()=>{
+    if(!currentUser) return;
+    updateDoc(doc(db,'users',currentUser.uid), { lastActive: serverTimestamp() }).catch(()=>{});
+  };
+  beat();
+  setInterval(beat, 25000);
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) beat(); });
+}
+
+async function refreshOnlineCount(){
+  try{
+    const cutoff = Timestamp.fromMillis(Date.now() - 60000);
+    const q2 = query(collection(db, 'users'), where('lastActive', '>', cutoff));
+    const snap = await getDocs(q2);
+    onlineCountTextEl.textContent = snap.size + ' متصل الآن';
+  }catch(e){
+    onlineCountTextEl.textContent = '';
+  }
+}
 
 function listenMessages(){
   if(unsubscribe) unsubscribe();
@@ -526,7 +702,7 @@ function listenMessages(){
 
       const nameEl = document.createElement('div');
       nameEl.className = 'msg-name';
-      nameEl.innerHTML = (m.name || 'طالب') + (m.verified ? ' <span class="badge">✔</span>' : '');
+      nameEl.innerHTML = (m.name || 'طالب') + (m.verified ? ' ' + VERIFIED_BADGE : '');
 
       const bubble = document.createElement('div');
       bubble.className = 'msg-bubble';
@@ -633,6 +809,44 @@ function listenMessages(){
             onClick: async ()=>{ try{ await deleteDoc(doc(db,'chatRooms',currentRoom,'messages',docSnap.id)); }catch(e){} }
           });
         }
+        if(!isOwn){
+          actions.push({
+            icon:'🚩', label:'إبلاغ عن الرسالة',
+            onClick: async ()=>{
+              try{
+                await addDoc(collection(db,'reports'), {
+                  roomId: currentRoom,
+                  messageId: docSnap.id,
+                  messageText: m.text || '',
+                  messageType: m.type || 'text',
+                  messageUid: m.uid,
+                  messageName: m.name || 'طالب',
+                  reporterUid: currentUser.uid,
+                  reporterName: currentProfile.name,
+                  createdAt: serverTimestamp(),
+                  status: 'pending'
+                });
+                alert('تم الإبلاغ عن الرسالة، هيراجعها المستر قريب.');
+              }catch(e){ alert('حصلت مشكلة، جرب تاني.'); }
+            }
+          });
+        }
+        if(isAdmin){
+          actions.push({
+            icon:'📌', label:'تثبيت كإعلان',
+            onClick: async ()=>{
+              try{
+                await setDoc(doc(db,'chatRooms',currentRoom), {
+                  pinnedMessage: {
+                    text: m.text || (m.type==='image' ? '📷 صورة' : '📎 ' + (m.fileName||'ملف')),
+                    name: m.name || 'المستر',
+                    updatedAt: serverTimestamp()
+                  }
+                }, { merge:true });
+              }catch(e){}
+            }
+          });
+        }
         openActionsMenu(bubble, actions);
       });
 
@@ -658,6 +872,12 @@ composer.addEventListener('submit', async (e)=>{
     };
     if(replyingTo) payload.replyTo = replyingTo;
     await addDoc(collection(db, 'chatRooms', currentRoom, 'messages'), payload);
+    setDoc(doc(db,'chatRooms',currentRoom), {
+      lastMessageAt: serverTimestamp(),
+      lastMessageText: text,
+      lastMessageUid: currentUser.uid
+    }, { merge:true }).catch(()=>{});
+    localStorage.setItem('lastRead_' + currentRoom, Date.now().toString());
     msgInput.value = '';
     clearReply();
   }catch(err){
@@ -698,6 +918,11 @@ onAuthStateChanged(auth, async (user)=>{
 
   renderRoomLists();
   listenMessages();
+  listenPinned();
+  listenAllRoomsMeta();
+  startPresence();
+  refreshOnlineCount();
+  setInterval(refreshOnlineCount, 20000);
 });
 </script>
 </body>

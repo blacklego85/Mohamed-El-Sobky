@@ -147,9 +147,18 @@ input:focus{border-color:var(--gold);}
 .theme-toggle .icon-moon{display:none;}
 html[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
 html[data-theme="dark"] .theme-toggle .icon-moon{display:block;}
+
+.ambient-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.ambient-bg span{position:absolute;font-family:'Amiri',serif;color:var(--gold);opacity:.06;will-change:transform;animation:ambientDrift linear infinite;}
+@keyframes ambientDrift{
+  0%{transform:translate(0,0) rotate(0deg);}
+  50%{transform:translate(-24px,-30px) rotate(9deg);}
+  100%{transform:translate(0,0) rotate(0deg);}
+}
 </style>
 </head>
 <body>
+<div class="ambient-bg" id="ambientBgLogin"></div>
 
 <div class="card">
   <button class="theme-toggle" id="themeToggle" title="تبديل الوضع الليلي/الفاتح" aria-label="تبديل الوضع الليلي والفاتح">
@@ -277,6 +286,20 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+(function(){
+  const letters=['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','س','ع'];
+  const layer=document.getElementById('ambientBgLogin');
+  const positions=[[10,15],[85,12],[15,80],[80,82],[50,8],[50,90]];
+  positions.forEach(pos=>{
+    const s=document.createElement('span');
+    s.textContent=letters[Math.floor(Math.random()*letters.length)];
+    s.style.left=pos[0]+'%'; s.style.top=pos[1]+'%';
+    s.style.fontSize=(45+Math.random()*60)+'px';
+    s.style.animationDuration=(16+Math.random()*12)+'s';
+    s.style.animationDelay=(Math.random()*8)+'s';
+    layer.appendChild(s);
+  });
+})();
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);

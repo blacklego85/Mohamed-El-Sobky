@@ -792,55 +792,8 @@ body.sticky-active .back-top{bottom:calc(88px + env(safe-area-inset-bottom,0px))
       <button class="tab-btn active" data-stage="prep">المرحلة الإعدادية</button>
       <button class="tab-btn" data-stage="sec">المرحلة الثانوية</button>
     </div>
-    <div class="course-grid">
-      <div class="course-card show reveal" data-stage="prep">
-        <div class="course-top"><span class="tag">إعدادي</span><h3>النحو والصرف الشامل</h3></div>
-        <div class="course-body">
-          <div class="course-rating">★★★★★<span>4.9 (142 تقييم)</span></div>
-          <ul><li>شرح كامل لقواعد الصف المحدد</li><li>تدريبات وامتحانات دورية</li><li>مذكرة PDF مرفقة</li></ul>
-          <div class="price-row"><div class="price">250<small> ج.م / شهر</small></div><a href="#" class="enroll-btn js-enroll" data-course="النحو والصرف الشامل - إعدادي">اشترك الآن</a></div>
-        </div>
-      </div>
-      <div class="course-card show reveal" data-stage="prep">
-        <div class="course-top"><span class="tag">إعدادي</span><h3>التعبير والإملاء</h3></div>
-        <div class="course-body">
-          <div class="course-rating">★★★★★<span>4.8 (97 تقييم)</span></div>
-          <ul><li>أساليب كتابة موضوع تعبير متكامل</li><li>تصحيح فردي للموضوعات</li><li>تدريبات إملاء أسبوعية</li></ul>
-          <div class="price-row"><div class="price">200<small> ج.م / شهر</small></div><a href="#" class="enroll-btn js-enroll" data-course="التعبير والإملاء - إعدادي">اشترك الآن</a></div>
-        </div>
-      </div>
-      <div class="course-card show reveal" data-stage="prep">
-        <div class="course-top"><span class="tag">إعدادي</span><h3>النصوص والأدب</h3></div>
-        <div class="course-body">
-          <div class="course-rating">★★★★★<span>4.9 (110 تقييم)</span></div>
-          <ul><li>شرح وتحليل نصوص المنهج</li><li>أسئلة متوقعة كل شهر</li><li>مراجعة نهائية شاملة</li></ul>
-          <div class="price-row"><div class="price">200<small> ج.م / شهر</small></div><a href="#" class="enroll-btn js-enroll" data-course="النصوص والأدب - إعدادي">اشترك الآن</a></div>
-        </div>
-      </div>
-      <div class="course-card reveal" data-stage="sec">
-        <div class="course-top"><span class="tag">ثانوي</span><h3>النحو الشامل + بنك أسئلة</h3></div>
-        <div class="course-body">
-          <div class="course-rating">★★★★★<span>5.0 (76 تقييم)</span></div>
-          <ul><li>كل أبواب النحو بالمنهج بالتفصيل</li><li>بنك أسئلة بأنماط الامتحان</li><li>حل امتحانات سنوات سابقة</li></ul>
-          <div class="price-row"><div class="price">350<small> ج.م / شهر</small></div><a href="#" class="enroll-btn js-enroll" data-course="النحو الشامل + بنك أسئلة - ثانوي">اشترك الآن</a></div>
-        </div>
-      </div>
-      <div class="course-card reveal" data-stage="sec">
-        <div class="course-top"><span class="tag">ثانوي</span><h3>البلاغة بالتحليل</h3></div>
-        <div class="course-body">
-          <div class="course-rating">★★★★★<span>4.8 (64 تقييم)</span></div>
-          <ul><li>الصور البيانية والمحسنات بالتطبيق</li><li>تدريب على تحليل نصوص جديدة</li><li>مذكرة شاملة بالأمثلة</li></ul>
-          <div class="price-row"><div class="price">300<small> ج.م / شهر</small></div><a href="#" class="enroll-btn js-enroll" data-course="البلاغة بالتحليل - ثانوي">اشترك الآن</a></div>
-        </div>
-      </div>
-      <div class="course-card reveal" data-stage="sec">
-        <div class="course-top"><span class="tag">ثانوي</span><h3>مراجعة نهائية شاملة</h3></div>
-        <div class="course-body">
-          <div class="course-rating">★★★★★<span>4.9 (58 تقييم)</span></div>
-          <ul><li>مراجعة كل فروع المادة قبل الامتحان</li><li>امتحانات محاكاة للثانوية العامة</li><li>خطة مذاكرة أخيرة يوم بيوم</li></ul>
-          <div class="price-row"><div class="price">400<small> ج.م / شهر</small></div><a href="#" class="enroll-btn js-enroll" data-course="مراجعة نهائية شاملة - ثانوي">اشترك الآن</a></div>
-        </div>
-      </div>
+    <div class="course-grid" id="courseGrid">
+      <div class="empty-courses reveal" style="grid-column:1/-1;text-align:center;color:#8a8064;padding:40px 0;">جاري تحميل الكورسات...</div>
     </div>
   </div>
 </section>
@@ -1210,6 +1163,7 @@ const io=new IntersectionObserver((entries)=>{
   entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in-view');io.unobserve(e.target);}});
 },{threshold:0.15});
 revealEls.forEach(el=>io.observe(el));
+window.observeReveal = (el)=> io.observe(el);
 
 // stat counters
 const counters=document.querySelectorAll('.stat-num');
@@ -1233,26 +1187,25 @@ counters.forEach(c=>counterIO.observe(c));
 
 // course tabs
 const tabBtns=document.querySelectorAll('.tab-btn');
-const courseCards=document.querySelectorAll('.course-card');
+let activeCourseStage='prep';
 tabBtns.forEach(btn=>{
   btn.addEventListener('click',()=>{
     tabBtns.forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    const stage=btn.dataset.stage;
-    courseCards.forEach(card=>{
-      card.classList.toggle('show',card.dataset.stage===stage);
-    });
+    activeCourseStage=btn.dataset.stage;
+    if(window.filterCoursesByStage) window.filterCoursesByStage(activeCourseStage);
   });
 });
+window.getActiveCourseStage=()=>activeCourseStage;
 
-// enroll buttons -> whatsapp
-document.querySelectorAll('.js-enroll').forEach(btn=>{
-  btn.addEventListener('click',(e)=>{
-    e.preventDefault();
-    const course=btn.dataset.course;
-    const msg=encodeURIComponent('السلام عليكم أستاذ محمد، عايز أشترك في كورس: '+course);
-    window.open('https://wa.me/201007367432?text='+msg,'_blank');
-  });
+// enroll buttons -> whatsapp (event delegation so it works for courses loaded dynamically)
+document.getElementById('courseGrid').addEventListener('click',(e)=>{
+  const btn=e.target.closest('.js-enroll');
+  if(!btn) return;
+  e.preventDefault();
+  const course=btn.dataset.course;
+  const msg=encodeURIComponent('السلام عليكم أستاذ محمد، عايز أشترك في كورس: '+course);
+  window.open('https://wa.me/201007367432?text='+msg,'_blank');
 });
 
 // video modal
@@ -1294,6 +1247,70 @@ document.getElementById('contactForm').addEventListener('submit',function(e){
   const name=inputs[0].value, phone=inputs[1].value, stage=inputs[2].value, message=inputs[3].value;
   const text='السلام عليكم أستاذ محمد،%0Aالاسم: '+name+'%0Aرقم الهاتف: '+phone+'%0Aالمرحلة: '+stage+'%0Aالرسالة: '+message;
   window.open('https://wa.me/201007367432?text='+text,'_blank');
+});
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDxpnYFbxF7Vtx_Y0v5cCbZddsUbs1Q2co",
+  authDomain: "mohamed-el-sobky-be252.firebaseapp.com",
+  projectId: "mohamed-el-sobky-be252",
+  storageBucket: "mohamed-el-sobky-be252.firebasestorage.app",
+  messagingSenderId: "1076421037716",
+  appId: "1:1076421037716:web:4145cd3c5a6787ba0fee81",
+  measurementId: "G-2W4LHCPTL1"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const courseGridEl = document.getElementById('courseGrid');
+
+// fallback shown only if Firestore has no courses yet (keeps the site from ever looking empty)
+const FALLBACK_COURSES = [
+  { title:'النحو والصرف الشامل', stage:'prep', price:250, priceNote:'ج.م / شهر', features:['شرح كامل لقواعد الصف المحدد','تدريبات وامتحانات دورية','مذكرة PDF مرفقة'] },
+  { title:'التعبير والإملاء', stage:'prep', price:200, priceNote:'ج.م / شهر', features:['أساليب كتابة موضوع تعبير متكامل','تصحيح فردي للموضوعات','تدريبات إملاء أسبوعية'] },
+  { title:'النصوص والأدب', stage:'prep', price:200, priceNote:'ج.م / شهر', features:['شرح وتحليل نصوص المنهج','أسئلة متوقعة كل شهر','مراجعة نهائية شاملة'] },
+  { title:'النحو الشامل + بنك أسئلة', stage:'sec', price:350, priceNote:'ج.م / شهر', features:['كل أبواب النحو بالمنهج بالتفصيل','بنك أسئلة بأنماط الامتحان','حل امتحانات سنوات سابقة'] },
+  { title:'البلاغة بالتحليل', stage:'sec', price:300, priceNote:'ج.م / شهر', features:['الصور البيانية والمحسنات بالتطبيق','تدريب على تحليل نصوص جديدة','مذكرة شاملة بالأمثلة'] },
+  { title:'مراجعة نهائية شاملة', stage:'sec', price:400, priceNote:'ج.م / شهر', features:['مراجعة كل فروع المادة قبل الامتحان','امتحانات محاكاة للثانوية العامة','خطة مذاكرة أخيرة يوم بيوم'] }
+];
+
+let coursesData = [];
+
+function renderCourseCards(){
+  const stage = window.getActiveCourseStage ? window.getActiveCourseStage() : 'prep';
+  const list = coursesData.length ? coursesData : FALLBACK_COURSES;
+  courseGridEl.innerHTML = '';
+  list.forEach(c=>{
+    const card = document.createElement('div');
+    card.className = 'course-card reveal' + (c.stage===stage ? ' show' : '');
+    card.dataset.stage = c.stage;
+    const tagLabel = c.stage === 'sec' ? 'ثانوي' : 'إعدادي';
+    const featuresHtml = (c.features||[]).map(f=>'<li>'+f+'</li>').join('');
+    card.innerHTML =
+      '<div class="course-top"><span class="tag">'+tagLabel+'</span><h3>'+c.title+'</h3></div>'+
+      '<div class="course-body"><ul>'+featuresHtml+'</ul>'+
+      '<div class="price-row"><div class="price">'+(c.price||0)+'<small> '+(c.priceNote||'ج.م / شهر')+'</small></div>'+
+      '<a href="#" class="enroll-btn js-enroll" data-course="'+c.title+' - '+tagLabel+'">اشترك الآن</a></div></div>';
+    courseGridEl.appendChild(card);
+    if(window.observeReveal) window.observeReveal(card);
+  });
+}
+window.filterCoursesByStage = function(stage){
+  courseGridEl.querySelectorAll('.course-card').forEach(card=>{
+    card.classList.toggle('show', card.dataset.stage===stage);
+  });
+};
+
+onSnapshot(query(collection(db,'courses'), orderBy('order','asc')), (snap)=>{
+  coursesData = [];
+  snap.forEach(d=> coursesData.push(d.data()));
+  renderCourseCards();
+}, ()=>{
+  renderCourseCards();
 });
 </script>
 </body>
