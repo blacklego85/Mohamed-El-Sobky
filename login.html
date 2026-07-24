@@ -335,6 +335,17 @@ function showMsg(text, type){
 }
 function clearMsg(){ msgBox.className = 'msg'; }
 
+// show ANY uncaught error directly on screen (mobile users can't open devtools easily)
+window.addEventListener('error', (e)=>{
+  showMsg('خطأ في الصفحة: ' + (e.message || 'غير معروف') + ' (سطر ' + e.lineno + ')', 'error');
+});
+window.addEventListener('unhandledrejection', (e)=>{
+  const reason = e.reason;
+  const msg = (reason && reason.message) ? reason.message : String(reason);
+  const code = (reason && reason.code) ? ' [' + reason.code + ']' : '';
+  showMsg('خطأ: ' + msg + code, 'error');
+});
+
 tabs.forEach(tab=>{
   tab.addEventListener('click', ()=>{
     tabs.forEach(t=>t.classList.remove('active'));
@@ -401,6 +412,7 @@ function isMobileDevice(){
 }
 async function googleSignIn(e){
   clearMsg();
+  showMsg('جاري التحويل لجوجل...', 'info');
   const btn = e && e.currentTarget;
   if(btn){ btn.disabled = true; }
   try{
