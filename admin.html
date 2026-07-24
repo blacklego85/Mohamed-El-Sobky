@@ -121,6 +121,7 @@ h1{font-family:'Amiri',serif;font-size:22px;margin-bottom:4px;}
     <div class="tabs-bar">
       <button class="tab-btn active" data-panel="students">👤 الطلاب</button>
       <button class="tab-btn" data-panel="courses">📚 الكورسات</button>
+      <button class="tab-btn" data-panel="subs">🔑 الاشتراكات</button>
       <button class="tab-btn" data-panel="reports">🚩 البلاغات<span class="count-dot" id="reportsCountDot">0</span></button>
     </div>
 
@@ -157,6 +158,38 @@ h1{font-family:'Amiri',serif;font-size:22px;margin-bottom:4px;}
       <div id="coursesList"><div class="empty">جاري التحميل...</div></div>
     </div>
 
+    <div class="panel" id="panel-subs">
+      <div class="course-form" id="subForm">
+        <div><label>إيميل الطالب</label><input type="email" id="subEmail" placeholder="student@gmail.com"></div>
+        <button type="button" class="save-btn" id="subSearchBtn">بحث عن الطالب</button>
+        <div class="gate-msg" id="subSearchMsg" style="min-height:auto;"></div>
+
+        <div id="subEditor" style="display:none;border-top:1px solid rgba(243,236,217,0.12);margin-top:6px;padding-top:14px;">
+          <div class="user-info" style="margin-bottom:10px;">
+            <div class="name" id="subUserName"></div>
+            <div class="email" id="subUserEmail"></div>
+          </div>
+          <div class="row2">
+            <div>
+              <label>كود الدخول الخاص بالطالب</label>
+              <input type="text" id="subCode" placeholder="مثال: 4821">
+            </div>
+            <div style="display:flex;align-items:flex-end;">
+              <button type="button" class="cancel-btn" id="subGenBtn" style="width:100%;">توليد كود عشوائي</button>
+            </div>
+          </div>
+          <div class="sub" id="subDeviceInfo" style="margin:8px 0;"></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button type="button" class="save-btn" id="subActivateBtn" style="flex:1;">تفعيل الاشتراك وحفظ الكود</button>
+            <button type="button" class="cancel-btn" id="subDeactivateBtn">إلغاء الاشتراك</button>
+            <button type="button" class="cancel-btn" id="subResetDeviceBtn">فك ربط الجهاز</button>
+          </div>
+        </div>
+      </div>
+      <div class="sub" style="margin-bottom:10px;">الاشتراكات المفعّلة حاليًا</div>
+      <div id="subsList"><div class="empty">جاري التحميل...</div></div>
+    </div>
+
     <div class="panel" id="panel-reports">
       <div id="reportsList"><div class="empty">جاري التحميل...</div></div>
     </div>
@@ -167,8 +200,8 @@ h1{font-family:'Amiri',serif;font-size:22px;margin-bottom:4px;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  getFirestore, doc, getDoc, updateDoc, deleteDoc, addDoc, collection, getDocs, onSnapshot,
-  query, orderBy
+  getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, getDocs, onSnapshot,
+  query, orderBy, where
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -250,6 +283,7 @@ function tryEnterDash(){
   dash.classList.add('active');
   loadUsers();
   loadCourses();
+  loadSubs();
   loadReports();
 }
 
@@ -377,10 +411,18 @@ function renderCourses(){
         <div class="cmeta">${c.stage === 'sec' ? 'ثانوي' : 'إعدادي'} · ${c.price} ${c.priceNote || ''} · ترتيب ${c.order ?? 0}</div>
       </div>
       <div class="actions">
+        <button class="content-course-btn">📖 المحتوى</button>
         <button class="edit-course-btn">تعديل</button>
         <button class="del-course-btn">حذف</button>
       </div>
+      <div class="lectures-editor" id="lecEditor-${c.id}" style="display:none;width:100%;margin-top:12px;border-top:1px solid rgba(243,236,217,0.12);padding-top:12px;"></div>
     `;
+    row.querySelector('.content-course-btn').addEventListener('click', ()=>{
+      const box = row.querySelector('.lectures-editor');
+      const isOpen = box.style.display === 'block';
+      box.style.display = isOpen ? 'none' : 'block';
+      if(!isOpen) renderLecturesEditor(box, c);
+    });
     row.querySelector('.edit-course-btn').addEventListener('click', ()=>{
       editingCourseId = c.id;
       cTitle.value = c.title || '';
@@ -415,6 +457,175 @@ function loadCourses(){
       renderCourses();
     });
   });
+}
+
+// ---- lectures (course content: video + file per lecture) ----
+function renderLecturesEditor(box, course){
+  let lectures = (course.lectures || []).map(l=>({...l}));
+
+  function draw(){
+    box.innerHTML = '';
+    lectures.forEach((lec, i)=>{
+      const row = document.createElement('div');
+      row.style.cssText = 'background:var(--ink);border-radius:10px;padding:10px;margin-bottom:8px;display:grid;gap:6px;';
+      row.innerHTML = `
+        <input type="text" placeholder="عنوان المحاضرة" value="${(lec.title||'').replace(/"/g,'&quot;')}" data-f="title">
+        <input type="text" placeholder="رابط الفيديو (يوتيوب/فيميو..)" value="${(lec.videoUrl||'').replace(/"/g,'&quot;')}" data-f="videoUrl">
+        <input type="text" placeholder="رابط الملف (PDF..)" value="${(lec.fileUrl||'').replace(/"/g,'&quot;')}" data-f="fileUrl">
+        <button type="button" class="cancel-btn del-lec-btn" style="width:fit-content;">حذف المحاضرة</button>
+      `;
+      row.querySelectorAll('input').forEach(inp=>{
+        inp.addEventListener('input', ()=>{ lectures[i][inp.dataset.f] = inp.value; });
+      });
+      row.querySelector('.del-lec-btn').addEventListener('click', ()=>{
+        lectures.splice(i,1);
+        draw();
+      });
+      box.appendChild(row);
+    });
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'cancel-btn';
+    addBtn.textContent = '➕ إضافة محاضرة';
+    addBtn.style.marginBottom = '8px';
+    addBtn.addEventListener('click', ()=>{ lectures.push({title:'',videoUrl:'',fileUrl:''}); draw(); });
+    box.appendChild(addBtn);
+
+    const saveBtn = document.createElement('button');
+    saveBtn.type = 'button';
+    saveBtn.className = 'save-btn';
+    saveBtn.style.width = '100%';
+    saveBtn.textContent = 'حفظ المحتوى';
+    saveBtn.addEventListener('click', async ()=>{
+      saveBtn.textContent = 'جاري الحفظ...';
+      try{
+        const clean = lectures.filter(l=>l.title && l.title.trim());
+        await updateDoc(doc(db,'courses',course.id), { lectures: clean });
+        saveBtn.textContent = 'اتحفظ ✓';
+        setTimeout(()=> saveBtn.textContent = 'حفظ المحتوى', 1500);
+      }catch(e){ alert('حصلت مشكلة في حفظ المحتوى.'); saveBtn.textContent = 'حفظ المحتوى'; }
+    });
+    box.appendChild(saveBtn);
+  }
+  draw();
+}
+
+// ---- subscriptions (academy access: personal code + single-device lock) ----
+const subEmailInput = document.getElementById('subEmail');
+const subSearchBtn = document.getElementById('subSearchBtn');
+const subSearchMsg = document.getElementById('subSearchMsg');
+const subEditor = document.getElementById('subEditor');
+const subUserName = document.getElementById('subUserName');
+const subUserEmail = document.getElementById('subUserEmail');
+const subCodeInput = document.getElementById('subCode');
+const subGenBtn = document.getElementById('subGenBtn');
+const subDeviceInfo = document.getElementById('subDeviceInfo');
+const subActivateBtn = document.getElementById('subActivateBtn');
+const subDeactivateBtn = document.getElementById('subDeactivateBtn');
+const subResetDeviceBtn = document.getElementById('subResetDeviceBtn');
+const subsListEl = document.getElementById('subsList');
+
+let currentSubUid = null;
+let currentSubData = null;
+
+function renderSubDeviceInfo(){
+  subDeviceInfo.textContent = currentSubData && currentSubData.deviceId
+    ? 'مربوط بجهاز حاليًا (لو المستخدم فتح من جهاز تاني هيتلغي اشتراكه تلقائيًا).'
+    : 'مش مربوط بأي جهاز لسه — هيتربط أول ما يدخل بالكود.';
+}
+
+subSearchBtn.addEventListener('click', async ()=>{
+  const email = subEmailInput.value.trim().toLowerCase();
+  if(!email){ return; }
+  subSearchMsg.textContent = 'بندور...';
+  subEditor.style.display = 'none';
+  try{
+    const usnap = await getDocs(query(collection(db,'users'), where('email','==', email)));
+    if(usnap.empty){
+      subSearchMsg.textContent = 'مفيش طالب مسجل بالإيميل ده. لازم يعمل حساب على login.html الأول.';
+      return;
+    }
+    const udoc = usnap.docs[0];
+    currentSubUid = udoc.id;
+    const udata = udoc.data();
+    subUserName.textContent = udata.name || '(بدون اسم)';
+    subUserEmail.textContent = email;
+
+    const ssnap = await getDoc(doc(db,'subscriptions',currentSubUid));
+    currentSubData = ssnap.exists() ? ssnap.data() : { active:false, code:'', deviceId:null };
+    subCodeInput.value = currentSubData.code || '';
+    renderSubDeviceInfo();
+    subSearchMsg.textContent = '';
+    subEditor.style.display = 'block';
+  }catch(e){
+    subSearchMsg.textContent = 'حصلت مشكلة في البحث، جرب تاني.';
+  }
+});
+
+subGenBtn.addEventListener('click', ()=>{
+  subCodeInput.value = String(Math.floor(1000 + Math.random()*9000));
+});
+
+subActivateBtn.addEventListener('click', async ()=>{
+  if(!currentSubUid) return;
+  const code = subCodeInput.value.trim();
+  if(!code){ alert('اكتب كود أو دوس توليد كود عشوائي.'); return; }
+  try{
+    await setDoc(doc(db,'subscriptions',currentSubUid), {
+      email: subUserEmail.textContent,
+      code,
+      active: true,
+      deviceId: (currentSubData && currentSubData.deviceId) || null
+    }, { merge: true });
+    currentSubData = { ...currentSubData, code, active:true };
+    alert('اتفعل الاشتراك وحُفظ الكود.');
+  }catch(e){ alert('حصلت مشكلة، جرب تاني.'); }
+});
+
+subDeactivateBtn.addEventListener('click', async ()=>{
+  if(!currentSubUid) return;
+  try{
+    await setDoc(doc(db,'subscriptions',currentSubUid), { active:false }, { merge:true });
+    currentSubData = { ...currentSubData, active:false };
+    alert('اتلغى الاشتراك.');
+  }catch(e){ alert('حصلت مشكلة، جرب تاني.'); }
+});
+
+subResetDeviceBtn.addEventListener('click', async ()=>{
+  if(!currentSubUid) return;
+  try{
+    await setDoc(doc(db,'subscriptions',currentSubUid), { deviceId:null }, { merge:true });
+    currentSubData = { ...currentSubData, deviceId:null };
+    renderSubDeviceInfo();
+    alert('اتفك ربط الجهاز، هيقدر يدخل من جهاز جديد تاني.');
+  }catch(e){ alert('حصلت مشكلة، جرب تاني.'); }
+});
+
+function renderSubsList(list){
+  if(list.length === 0){
+    subsListEl.innerHTML = '<div class="empty">مفيش اشتراكات مفعّلة لسه</div>';
+    return;
+  }
+  subsListEl.innerHTML = '';
+  list.forEach(s=>{
+    const row = document.createElement('div');
+    row.className = 'user-row';
+    row.innerHTML = `
+      <div class="user-info">
+        <div class="name">${s.email || s.id}</div>
+        <div class="email">${s.deviceId ? 'مربوط بجهاز' : 'من غير جهاز مربوط'} · الكود: ${s.code || '-'}</div>
+      </div>
+    `;
+    subsListEl.appendChild(row);
+  });
+}
+
+function loadSubs(){
+  onSnapshot(query(collection(db,'subscriptions'), where('active','==', true)), (snap)=>{
+    const list = [];
+    snap.forEach(d=> list.push({ id: d.id, ...d.data() }));
+    renderSubsList(list);
+  }, ()=>{ subsListEl.innerHTML = '<div class="empty">مفيش اشتراكات مفعّلة لسه</div>'; });
 }
 
 // ---- reports review ----
