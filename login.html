@@ -416,16 +416,14 @@ async function googleSignIn(e){
   const btn = e && e.currentTarget;
   if(btn){ btn.disabled = true; }
   try{
-    if(isMobileDevice()){
-      // popups are unreliable on mobile browsers; use a full-page redirect instead
-      await signInWithRedirect(auth, googleProvider);
-      return;
-    }
+    // popup first on ALL devices (including mobile): signInWithRedirect fails silently
+    // on many mobile browsers now because they block third-party storage access needed
+    // to complete the redirect flow across the firebaseapp.com auth domain.
     const result = await signInWithPopup(auth, googleProvider);
     checkProfileThenGo(result.user);
   }catch(err){
     console.error('Google sign-in error:', err);
-    if(err && (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request')){
+    if(err && (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request' || err.code === 'auth/operation-not-supported-in-this-environment')){
       try{ await signInWithRedirect(auth, googleProvider); return; }catch(e2){ console.error('Redirect fallback error:', e2); }
     }
     showMsg(translateError(err && err.code) + (err && err.code ? ' (' + err.code + ')' : ''), 'error');
